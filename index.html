@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="用荆霄鹏 JXP 行楷练习汉字字形回忆的本地学习工具。"
+    />
+    <title>行楷忆写</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-seal" aria-hidden="true">忆</span>
+          <div>
+            <h1>行楷忆写</h1>
+            <p>先想字形，再看笔意</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="source-label" title="当前学习文件">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 2.75h8.4L19 7.35v13.9H6z"></path>
+              <path d="M14 2.75v5h5M9 12h7M9 16h7"></path>
+            </svg>
+            <span id="source-name">正在读取…</span>
+          </div>
+          <button
+            class="button search-trigger"
+            id="search-trigger"
+            type="button"
+            aria-label="搜索汉字行楷字形"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5"></circle>
+              <path d="m15.5 15.5 4.25 4.25"></path>
+            </svg>
+            <span>查字</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+          <button class="button button-quiet" id="import-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5"></path>
+              <path d="M4 14.5v4.25A2.25 2.25 0 0 0 6.25 21h11.5A2.25 2.25 0 0 0 20 18.75V14.5"></path>
+            </svg>
+            导入词表
+          </button>
+          <input id="file-input" type="file" accept=".txt,text/plain" hidden />
+        </div>
+      </header>
+
+      <div class="workspace">
+        <section class="study-card" aria-label="行楷练习">
+          <div class="study-toolbar">
+            <div class="position">
+              <span class="position-label">本轮进度</span>
+              <strong id="position-current">—</strong>
+              <span class="position-divider">/</span>
+              <span id="position-total">—</span>
+            </div>
+
+            <button
+              class="order-toggle"
+              id="order-toggle"
+              type="button"
+              aria-pressed="false"
+              title="切换学习顺序"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h11M4 12h8M4 17h5"></path>
+                <path d="m16 15 3 3 2-2"></path>
+              </svg>
+              <span>顺序学习</span>
+            </button>
+          </div>
+
+          <div class="prompt">
+            <p class="eyebrow" id="prompt-eyebrow">先在纸上写一遍</p>
+            <div class="prompt-line">
+              <span class="prompt-label">今日汉字</span>
+              <strong class="prompt-character" id="prompt-character">—</strong>
+            </div>
+          </div>
+
+          <div class="practice-stage" id="practice-stage" aria-live="polite">
+            <div class="loading-state">
+              <span class="loading-ring" aria-hidden="true"></span>
+              <p>正在载入词表…</p>
+            </div>
+          </div>
+
+          <button class="reveal-button" id="reveal-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M2.75 12s3.35-5.5 9.25-5.5 9.25 5.5 9.25 5.5-3.35 5.5-9.25 5.5S2.75 12 2.75 12Z"></path>
+              <circle cx="12" cy="12" r="2.75"></circle>
+            </svg>
+            <span id="reveal-button-label">揭晓 JXP 行楷</span>
+            <kbd>Space</kbd>
+          </button>
+
+          <div class="rating-panel" id="rating-panel" hidden>
+            <p>刚才写出来了吗？</p>
+            <div class="rating-buttons">
+              <button class="rating-button rating-forgot" type="button" data-rating="forgot">
+                <kbd>1</kbd>
+                <span>忘了</span>
+              </button>
+              <button class="rating-button rating-fuzzy" type="button" data-rating="fuzzy">
+                <kbd>2</kbd>
+                <span>有点模糊</span>
+              </button>
+              <button class="rating-button rating-mastered" type="button" data-rating="mastered">
+                <kbd>3</kbd>
+                <span>记住了</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="navigation">
+            <button class="nav-button" id="previous-button" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6"></path>
+              </svg>
+              上一字
+            </button>
+            <span class="keyboard-hint">
+              <kbd>←</kbd><kbd>→</kbd> 切换
+            </span>
+            <button class="nav-button" id="next-button" type="button">
+              下一字
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        <aside class="session-panel" aria-label="学习统计">
+          <section class="progress-card">
+            <div class="progress-ring" id="progress-ring">
+              <div>
+                <strong id="mastered-percent">0%</strong>
+                <span>已掌握</span>
+              </div>
+            </div>
+            <h2>这一遍，慢慢来</h2>
+            <p>行楷不是写快，而是把笔画之间的气脉记住。</p>
+          </section>
+
+          <section class="stats-card">
+            <div class="section-title">
+              <h2>学习记录</h2>
+              <button class="text-button" id="reset-button" type="button">清空</button>
+            </div>
+            <dl class="stats-list">
+              <div>
+                <dt><span class="dot dot-new"></span>未学习</dt>
+                <dd id="new-count">0</dd>
+              </div>
+              <div>
+                <dt><span class="dot dot-fuzzy"></span>需复习</dt>
+                <dd id="review-count">0</dd>
+              </div>
+              <div>
+                <dt><span class="dot dot-mastered"></span>已掌握</dt>
+                <dd id="mastered-count">0</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="tip-card">
+            <span class="tip-number">字形提示</span>
+            <p>
+              先在纸上写出脑海里的样子，再揭晓比较。差异往往就在起笔方向、重心和牵丝上。
+            </p>
+          </section>
+
+          <p class="font-note">
+            大字使用本机字体<br />
+            <span>绿木屐JXP行楷</span>
+          </p>
+        </aside>
+      </div>
+    </main>
+
+    <div class="search-overlay" id="search-overlay" hidden>
+      <section
+        class="search-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="search-title"
+      >
+        <header class="search-header">
+          <div>
+            <span class="search-kicker">字形速查</span>
+            <h2 id="search-title">查一个字</h2>
+          </div>
+          <button class="close-button" id="search-close" type="button" aria-label="关闭查字">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 6 12 12M18 6 6 18"></path>
+            </svg>
+          </button>
+        </header>
+
+        <label class="search-input-wrap" for="search-input">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="m15.5 15.5 4.25 4.25"></path>
+          </svg>
+          <input
+            id="search-input"
+            type="text"
+            inputmode="search"
+            autocomplete="off"
+            maxlength="12"
+            placeholder="输入汉字，如「我」"
+            aria-label="输入要查找的汉字"
+          />
+          <kbd>Esc</kbd>
+        </label>
+
+        <div class="search-preview" id="search-preview" aria-live="polite"></div>
+
+        <footer class="search-footer">
+          <span>支持任意汉字预览；词表中的字可直接进入学习。</span>
+          <span><kbd>Enter</kbd> 定位查看</span>
+        </footer>
+      </section>
+    </div>
+
+    <div class="drop-overlay" id="drop-overlay" hidden>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5"></path>
+          <path d="M4 14.5v4.25A2.25 2.25 0 0 0 6.25 21h11.5A2.25 2.25 0 0 0 20 18.75V14.5"></path>
+        </svg>
+        <strong>松开以载入词表</strong>
+        <span>支持 level-1.txt 这类 UTF-8 文本</span>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
