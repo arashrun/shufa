@@ -16,6 +16,8 @@ python3 serve.py --no-browser
 
 然后访问终端中显示的本地地址。
 
+同一用户重复运行 `serve.py` 时，后续启动会检测到已有实例并直接退出。
+
 ## 使用
 
 - 先看页面上方的“今日汉字”，在纸上回忆并写出它的行楷形态。
@@ -29,3 +31,13 @@ python3 serve.py --no-browser
 ## 字体
 
 页面使用系统中已安装的 `绿木屐JXP行楷` 字体。为了确保浏览器使用正确字形，请不要在系统中卸载该字体。如果字体名称不同，可在 `styles.css` 的 `--jxp-font` 中修改。
+
+## 创建 Linux 应用启动器
+
+可以用 GTK3 工具快速创建并安装当前用户的 `.desktop` 文件：
+
+```bash
+python3 desktop_launcher_creator.py
+```
+
+填写应用名称和启动命令，工作目录、注释和图标文件均可选。工具会显示预览，并把启动器安装到 `~/.local/share/applications/`。未选择图标时，会在 `~/.local/share/icons/desktop-launchers/` 生成一个以内置 SVG 绘制的应用名称首字符图标。安装后，桌面环境通常会自动刷新应用菜单；若没有刷新，可重新登录或手动刷新应用缓存。
