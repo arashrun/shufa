@@ -42,6 +42,40 @@ body {
     #eee7da;
 }
 
+.device-settings {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.device-settings summary { cursor: pointer; }
+.device-settings-body { padding-top: 12px; }
+.device-settings label { display: block; margin: 12px 0; }
+.device-settings input:not([type="checkbox"]) {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.device-settings p { color: var(--ink-soft); line-height: 1.7; }
+.update-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.device-settings [hidden] { display: none !important; }
+
+@supports (padding-top: env(safe-area-inset-top)) {
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+}
+
 body::before {
   position: fixed;
   inset: 0;

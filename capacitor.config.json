@@ -1,0 +1,13 @@
+{
+  "appId": "io.github.xingkai.recall",
+  "appName": "行楷忆写",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "AppUpdater": {
+      "updateRepository": ""
+    }
+  }
+}
