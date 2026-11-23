@@ -112,3 +112,37 @@ def test_anchor_is_stable_and_valid():
     again = structure.to_json(structure.analyze_text("明", ids_data), "level-1.txt")
     assert data["anchor"] == again["anchor"]
     assert data["anchor"].replace("-", "").isalnum()
+
+
+def test_modal_markup_and_glyph_attributes():
+    ids_data = load_data()
+    entries = structure.analyze_text("明森", ids_data)
+    data = structure.to_json(entries, "demo.txt")
+    html = structure.render_html([data], [{"name": "欧体", "slug": "outi"}])
+    # 弹窗容器与书家数据注入
+    assert 'id="glyph-modal"' in html
+    assert '"欧体"' in html and '"slug":"outi"' in html.replace(" ", "")
+    # 字格带 data-char 与 data-ids，弹窗 JS 按码点拼图片路径
+    assert 'data-char="明"' in html and 'data-ids="⿰日月"' in html
+    assert "codePointAt" in html and "glyph-images/" in html
+    # Esc / 遮罩点击关闭，缺字回退提示
+    assert "Escape" in html and "未被" in html
+    # 未提供书家时不注入弹窗 DOM（仅 CSS 类名存在）
+    plain = structure.render_html([data])
+    assert 'id="glyph-modal"' not in plain
+    assert "codePointAt" not in plain
+
+
+def test_render_glyph_images(tmp_path):
+    pytest = __import__("pytest")
+    font_path = structure.resolve_font_file("欧阳询书法字体")
+    if font_path is None:
+        pytest.skip("本机未安装欧阳询书法字体")
+    rendered = structure.render_glyph_images(["明", "A"], font_path, tmp_path)
+    # 「明」生成图片；拉丁 "A" 是否收录取决于字体，仅要求不崩溃且结果一致
+    assert "明" in rendered
+    image_file = tmp_path / rendered["明"]
+    assert image_file.is_file() and image_file.stat().st_size > 0
+    from PIL import Image
+    image = Image.open(image_file)
+    assert image.size == (structure.GLYPH_IMAGE_SIZE, structure.GLYPH_IMAGE_SIZE)
