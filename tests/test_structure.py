@@ -56,7 +56,7 @@ def test_render_html_grid_alignment():
     ids_data = load_data()
     entries = structure.analyze_text("明森园一个虎", ids_data)
     data = structure.to_json(entries, "demo.txt")
-    html = structure.render_html(data)
+    html = structure.render_html([data])
     # 6 个字，每个渲染为恰好一个格子
     assert html.count('class="glyph"') == 6
     # 表头列数与数据列一致，且包含计数
@@ -71,6 +71,44 @@ def test_html_escapes():
     ids_data = load_data()
     entries = structure.analyze_text("明", ids_data)
     data = structure.to_json(entries, "<img src=x onerror=alert(1)>.txt")
-    html = structure.render_html(data)
+    html = structure.render_html([data])
     assert "<img" not in html
     assert "&lt;img" in html
+
+
+def test_multi_file_independent_tables():
+    ids_data = load_data()
+    one = structure.to_json(structure.analyze_text("明月", ids_data), "a.txt")
+    two = structure.to_json(structure.analyze_text("森园", ids_data), "b.txt")
+    html = structure.render_html([one, two])
+
+    # 每个文件一个独立表格块，不融合
+    assert html.count('<section class="source-block"') == 2
+    assert html.count('class="structure"') == 2
+    # 各自的标题独立
+    assert ">a.txt<" in html and ">b.txt<" in html
+    # 各自的表内字序独立：第一块含"明"不含"森"
+    first_block = html.split("</section>")[0]
+    assert "明" in first_block and "森" not in first_block
+    # 多文件时页首有锚点索引
+    assert html.count('class="file-index"') == 1
+    assert f'href="#{one["anchor"]}"' in html and f'href="#{two["anchor"]}"' in html
+    # 字符总数 = 两表各自字数之和，无跨文件去重
+    assert html.count('class="glyph"') == 4
+
+
+def test_single_file_keeps_legacy_layout():
+    ids_data = load_data()
+    data = structure.to_json(structure.analyze_text("明", ids_data), "a.txt")
+    html = structure.render_html([data])
+    assert html.count('<section class="source-block"') == 1
+    # 单文件时不显示文件索引
+    assert 'class="file-index"' not in html
+
+
+def test_anchor_is_stable_and_valid():
+    ids_data = load_data()
+    data = structure.to_json(structure.analyze_text("明", ids_data), "level-1.txt")
+    again = structure.to_json(structure.analyze_text("明", ids_data), "level-1.txt")
+    assert data["anchor"] == again["anchor"]
+    assert data["anchor"].replace("-", "").isalnum()

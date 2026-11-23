@@ -11,6 +11,9 @@
   # 生成 HTML 网格页（列 = 结构类别，行内按文本出现顺序，表头 = 文件名）
   python3 scripts/structure.py --file level-1.txt --html structure.html
 
+  # 多个输入文件：HTML 中每个文件一个独立表格块，页首有文件索引
+  python3 scripts/structure.py --file a.txt --file b.txt --html tables.html --json tables.json
+
 数据来源：CHISE IDS 数据文件（放在 data/ids/ 下，UTF-8 文本）。
 数据文件行格式：U+660E<TAB>明<TAB>⿰日月
 """
@@ -20,6 +23,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import sys
 import unicodedata
 from collections import OrderedDict
 from pathlib import Path
@@ -95,6 +99,10 @@ def is_hanzi(character: str) -> bool:
     return "CJK" in name or "IDEOGRAPH" in name
 
 
+def is_hanzi_in(text: str) -> bool:
+    return any(is_hanzi(char) for char in text)
+
+
 def structure_of(character: str, ids_data: dict[str, str]) -> str:
     """返回汉字的结构类别（列名）。"""
     if character in SINGLE_OVERRIDES:
@@ -141,12 +149,20 @@ def group_by_structure(entries: list[dict]) -> "OrderedDict[str, list[dict]]":
     return grouped
 
 
-def to_json(entries: list[dict], source_name: str) -> dict:
+def to_json(entries: list[dict], source_name: str, anchor: str | None = None) -> dict:
     """HTML 友好的存储结构：列名 + 每列按文本出现顺序的汉字。"""
     grouped = group_by_structure(entries)
     columns = [label for label in COLUMN_ORDER if grouped.get(label)]
+    if anchor is None:
+        # 由来源名生成稳定、合法的 HTML 锚点：非 ASCII 字符转十六进制码点
+        kept = "".join(
+            c if c.isascii() and c.isalnum() else f"-{ord(c):x}-"
+            for c in source_name
+        ).strip("-")
+        anchor = "s-" + (kept or "source")
     return {
         "source": source_name,
+        "anchor": anchor,
         "count": len(entries),
         "columns": columns,
         "rows": {
@@ -213,6 +229,40 @@ HTML_TEMPLATE = """<!doctype html>
       color: var(--ink-muted);
       font-size: 12px;
       letter-spacing: 0.1em;
+    }}
+    nav.file-index {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 26px;
+    }}
+    nav.file-index a {{
+      padding: 6px 13px;
+      color: var(--ink-soft);
+      background: rgba(255, 253, 247, 0.78);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 12px;
+      text-decoration: none;
+      transition:
+        border-color 150ms ease,
+        color 150ms ease;
+    }}
+    nav.file-index a:hover {{
+      color: var(--cinnabar);
+      border-color: var(--line-strong);
+    }}
+    section.source-block {{ margin-bottom: 44px; }}
+    section.source-block > h2 {{
+      margin: 0 0 14px;
+      font-family: var(--serif-font);
+      font-size: 17px; font-weight: 600; letter-spacing: 0.08em;
+    }}
+    section.source-block > h2 small {{
+      margin-left: 10px;
+      color: var(--ink-muted);
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 10px; font-weight: 400; letter-spacing: 0;
     }}
     .table-wrap {{
       border: 1px solid var(--line-strong);
@@ -283,18 +333,7 @@ HTML_TEMPLATE = """<!doctype html>
       <h1>字形结构分布</h1>
       <span class="meta">{meta}</span>
     </header>
-    <div class="table-wrap">
-      <table class="structure">
-        <thead>
-          <tr>
-{header_cells}
-          </tr>
-        </thead>
-        <tbody>
-{body_rows}
-        </tbody>
-      </table>
-    </div>
+{content}
     <footer>{footer}</footer>
   </div>
 </body>
@@ -302,10 +341,28 @@ HTML_TEMPLATE = """<!doctype html>
 """
 
 
-def render_html(data: dict) -> str:
+TABLE_TEMPLATE = """<section class="source-block" id="{anchor}">
+  <h2>{title}<small>{summary}</small></h2>
+  <div class="table-wrap">
+    <table class="structure">
+      <thead>
+        <tr>
+{header_cells}
+        </tr>
+      </thead>
+      <tbody>
+{body_rows}
+      </tbody>
+    </table>
+  </div>
+</section>"""
+
+
+def render_table(data: dict) -> str:
+    """渲染单个来源文件的独立表格块。"""
     columns = data["columns"]
     header_cells = "\n".join(
-        f'          <th>{html.escape(label)}'
+        f'        <th>{html.escape(label)}'
         f'<span class="count">{len(data["rows"][label])}</span></th>'
         for label in columns
     )
@@ -320,21 +377,53 @@ def render_html(data: dict) -> str:
             if row_index < len(characters):
                 char = characters[row_index]
                 cells.append(
-                    "          <td>"
+                    "        <td>"
                     f'<span class="glyph" title="{html.escape(label)}：{html.escape(char)}">'
                     f'{html.escape(char)}</span>'
                     "</td>"
                 )
             else:
                 # 无内容的格子保持占位，保证表格行对齐
-                cells.append("          <td></td>")
-        body_rows.append("        <tr>\n" + "\n".join(cells) + "\n        </tr>")
-    return HTML_TEMPLATE.format(
+                cells.append("        <td></td>")
+        body_rows.append("      <tr>\n" + "\n".join(cells) + "\n      </tr>")
+    return TABLE_TEMPLATE.format(
+        anchor=html.escape(data["anchor"], quote=True),
         title=html.escape(data["source"]),
-        meta=f'{html.escape(data["source"])} · 共 {data["count"]} 字 · {len(columns)} 类结构',
+        summary=html.escape(f'{data["count"]} 字 · {len(columns)} 类结构'),
         header_cells=header_cells,
         body_rows="\n".join(body_rows),
-        footer=f"数据来源：CHISE IDS · 生成于 {html.escape(Path(data['source']).name)}",
+    )
+
+
+def render_html(datasets: list[dict]) -> str:
+    """渲染整页。多个文件时每个文件一个独立表格块，页首提供文件索引。"""
+    sections = "\n".join(render_table(data) for data in datasets)
+    multi = len(datasets) > 1
+
+    nav = ""
+    if multi:
+        links = "\n".join(
+            f'      <a href="#{html.escape(data["anchor"], quote=True)}">'
+            f'{html.escape(data["source"])}</a>'
+            for data in datasets
+        )
+        nav = f'    <nav class="file-index">\n{links}\n    </nav>'
+
+    total = sum(data["count"] for data in datasets)
+    if multi:
+        title = f"字形结构 — {len(datasets)} 个文件"
+        meta = f"{len(datasets)} 个文件 · 共 {total} 字"
+    else:
+        only = datasets[0]
+        title = f"字形结构 — {html.escape(only['source'])}"
+        meta = f'{html.escape(only["source"])} · 共 {only["count"]} 字 · {len(only["columns"])} 类结构'
+
+    sources = "、".join(data["source"] for data in datasets)
+    return HTML_TEMPLATE.format(
+        title=title,
+        meta=meta,
+        content=nav + "\n" + sections if nav else sections,
+        footer=f"数据来源：CHISE IDS · 来源文件：{html.escape(sources)}",
     )
 
 
@@ -345,17 +434,23 @@ def main() -> None:
         description="基于 IDS 输出汉字字形结构，支持单字或文本文件 → JSON / HTML 网格页",
     )
     parser.add_argument("characters", nargs="*", help="要分析的汉字（可多个）")
-    parser.add_argument("--file", help="输入文本文件（按其中汉字首次出现顺序处理）")
-    parser.add_argument("--json", help="输出 JSON 存储结构到指定文件")
+    parser.add_argument(
+        "--file", action="append", dest="files", metavar="FILE",
+        help="输入文本文件（按其中汉字首次出现顺序处理），可重复传入多个文件；"
+        "HTML 中每个文件生成一个独立表格",
+    )
+    parser.add_argument("--json", help="输出 JSON 存储结构到指定文件（多文件时输出数组）")
     parser.add_argument("--html", help="输出 HTML 网格页到指定文件")
     parser.add_argument("--ids-dir", default=str(IDS_DIR), help="IDS 数据目录（默认 data/ids/）")
     args = parser.parse_args()
 
-    if not args.characters and not args.file:
+    files = args.files or []
+    if not args.characters and not files:
         parser.error("请提供要分析的汉字，或使用 --file 指定文本文件")
+    ids_data = load_ids_data(Path(args.ids_dir))
+
     if not args.json and not args.html and args.characters:
         # 单字模式直接打印
-        ids_data = load_ids_data(Path(args.ids_dir))
         for character in args.characters:
             for ch in character:
                 if is_hanzi(ch):
@@ -365,27 +460,39 @@ def main() -> None:
     if not args.json and not args.html:
         parser.error("批处理模式需要 --json 或 --html 至少指定一个输出")
 
-    ids_data = load_ids_data(Path(args.ids_dir))
-    if args.file:
-        text = Path(args.file).read_text(encoding="utf-8")
-        source_name = Path(args.file).name
+    # 每个输入文件独立分析（不合并、不跨文件去重）
+    datasets: list[dict] = []
+    if files:
+        for name in files:
+            path = Path(name)
+            if not path.exists():
+                raise SystemExit(f"输入文件不存在：{path}")
+            entries = analyze_text(path.read_text(encoding="utf-8"), ids_data)
+            if entries:
+                datasets.append(to_json(entries, path.name))
+            else:
+                print(f"跳过 {path.name}（未发现汉字）", file=sys.stderr)
     else:
-        text = "".join(args.characters)
-        source_name = "命令行输入"
+        combined = "".join(args.characters)
+        if is_hanzi_in(combined):
+            datasets.append(to_json(analyze_text(combined, ids_data), "命令行输入"))
 
-    entries = analyze_text(text, ids_data)
+    if not datasets:
+        raise SystemExit("所有输入都没有发现汉字，未生成任何输出")
+
     if args.json:
+        payload = datasets if files and len(datasets) > 1 else datasets[0]
         Path(args.json).write_text(
-            json.dumps(to_json(entries, source_name), ensure_ascii=False, indent=2),
+            json.dumps(payload, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
         print(f"已写出 {args.json}")
     if args.html:
         Path(args.html).write_text(
-            render_html(to_json(entries, source_name)),
+            render_html(datasets),
             encoding="utf-8",
         )
-        print(f"已写出 {args.html}")
+        print(f"已写出 {args.html}（{len(datasets)} 个表格）" if len(datasets) > 1 else f"已写出 {args.html}")
 
 
 if __name__ == "__main__":
