@@ -20,3 +20,6 @@ __pycache__/
 .pytest_cache/
 # CHISE IDS 数据文件体积较大且可重新下载，不入库
 data/ids/*.txt
+# structure.py 在根目录跑时留下的生成产物（正式产物在 tools/ 下）
+/glyph-images/
+/fonts/*.ttf

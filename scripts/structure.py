@@ -69,6 +69,7 @@ COLUMN_ORDER = [
 # 两种来源可同时配置，弹窗内并列展示（字体渲染 + 帖拓集字）。
 CALLIGRAPHERS = [
     {"name": "欧体", "slug": "outi", "family": "欧阳询书法字体", "aliases": ["歐陽詢"]},
+    {"name": "规范楷体", "slug": "kaiti", "family": "方正楷体简体", "aliases": []},
 ]
 
 # 弹窗图片渲染参数

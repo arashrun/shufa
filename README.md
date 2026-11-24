@@ -41,6 +41,24 @@ python3 desktop_launcher_creator.py
 ```
 
 填写应用名称和启动命令，工作目录、注释和图标文件均可选。工具会显示预览，并把启动器安装到 `~/.local/share/applications/`。未选择图标时，会在 `~/.local/share/icons/desktop-launchers/` 生成一个以内置 SVG 绘制的应用名称首字符图标。安装后，桌面环境通常会自动刷新应用菜单；若没有刷新，可重新登录或手动刷新应用缓存。
+ 
+## 工具页架构（多页面 + 共享导航）
+
+应用采用「首页 + 工具页」多页面架构，方便扩展任意多的单页小工具：
+
+```
+tools/<name>/        每个工具一个自包含目录（HTML + 字体 + 图片资源）
+tools/<name>/tool.json   工具清单：{"title", "entry", "desc"}
+```
+
+- 构建时自动把每个工具拷到 `dist/tools/<name>/`，并向其 HTML 注入
+  共享导航（`src/tools-nav.js|css`），同时生成 `dist/tools.json` 注册表
+- 导航 UI：底部栏（首页 / 工具），点「工具」弹出工具箱抽屉列出全部工具
+- 新增工具只需：生成 HTML 到 `tools/<name>/index.html` + 写 `tool.json`，重新构建即可
+- 页面跳转用相对路径（`data-root` 处理子目录深度），file:// 与 Capacitor 均可用
+
+现有工具：字形结构（`tools/structure/`，三词表 8103 字 IDS 网格，点击汉字
+弹窗看欧体/规范楷体实时渲染与 wikichina 帖拓集字）。
 
 ## Android 应用（Capacitor 封装）
 
