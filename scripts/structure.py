@@ -61,10 +61,14 @@ COLUMN_ORDER = [
     "独体字", "未知",
 ]
 
-# 集字书家配置：name = 显示名，slug = 图片目录名，family = 本机字体族名（fc-match 解析）。
-# 后续增加其他书家楷体时，在此追加一项即可。
+# 集字书家配置：
+#   name    = 显示名
+#   slug    = 资源目录名（fonts/ 与 glyph-images/ 下）
+#   family  = 本机字体族名（fc-match 解析），弹窗用 Canvas 实时渲染大字
+#   aliases = wikichina 书法字典的作者名（繁体），匹配 data/calligraphy/<字>/ 下的集字图
+# 两种来源可同时配置，弹窗内并列展示（字体渲染 + 帖拓集字）。
 CALLIGRAPHERS = [
-    {"name": "欧体", "slug": "outi", "family": "欧阳询书法字体"},
+    {"name": "欧体", "slug": "outi", "family": "欧阳询书法字体", "aliases": ["歐陽詢"]},
 ]
 
 # 弹窗图片渲染参数
@@ -183,24 +187,79 @@ def render_glyph_images(
     return rendered
 
 
-def prepare_calligrapher_images(
+def prepare_calligrapher_resources(
     characters: list[str],
     html_dir: Path,
     calligraphers: list[dict] | None = None,
     images_dirname: str = "glyph-images",
+    calligraphy_dir: Path | None = None,
+    pre_render: bool = False,
 ) -> list[dict]:
-    """为所有书家渲染集字图片，返回成功解析到字体的书家列表（含 slug 供 HTML 使用）。"""
+    """准备弹窗资源，返回注入 HTML 的书家配置列表。
+
+    每个书家可带两类来源：
+      - 字体实时渲染：把字体文件拷到 html_dir/fonts/<slug>.<ext>，
+        弹窗用 @font-face + Canvas 现场绘制（矢量清晰，体积仅字体一份）
+      - wikichina 集字图：从 calligraphy_dir/<字>/<书家别名>-*.png|.jpg
+        拷到 glyph-images/<slug>/<码点>-<序号>.png
+    pre_render=True 时额外用字体预渲染 PNG（离线查看的回退）。
+    """
+    import shutil
+
+    if calligraphy_dir is None:
+        calligraphy_dir = ROOT / "data" / "calligraphy"
     resolved: list[dict] = []
     for item in (calligraphers if calligraphers is not None else CALLIGRAPHERS):
-        font_path = resolve_font_file(item["family"])
-        if font_path is None:
-            print(f"警告：找不到「{item['name']}」字体（{item['family']}），跳过其集字图片", file=sys.stderr)
-            continue
-        rendered = render_glyph_images(
-            characters, font_path, html_dir / images_dirname / item["slug"],
-        )
-        resolved.append({**item, "rendered": len(rendered)})
-        print(f"已渲染 {item['name']} 集字图片：{len(rendered)} 字 → {images_dirname}/{item['slug']}/")
+        entry: dict = {
+            "name": item["name"], "slug": item["slug"],
+            "font": None, "covered": [], "images": {},
+        }
+        font_path = resolve_font_file(item["family"]) if item.get("family") else None
+        if item.get("family") and font_path is None:
+            print(
+                f"警告：找不到「{item['name']}」字体（{item['family']}），"
+                "弹窗将只显示集字图（如有）",
+                file=sys.stderr,
+            )
+        if font_path is not None:
+            covered = font_coverage(font_path)
+            covered_chars = [ch for ch in characters if ord(ch) in covered]
+            fonts_dir = html_dir / "fonts"
+            fonts_dir.mkdir(parents=True, exist_ok=True)
+            dest = fonts_dir / (item["slug"] + font_path.suffix.lower())
+            shutil.copy2(font_path, dest)
+            entry["font"] = f"fonts/{dest.name}"
+            entry["covered"] = [f"{ord(ch):x}" for ch in covered_chars]
+            print(
+                f"已复制 {item['name']} 字体 → fonts/{dest.name}"
+                f"（覆盖 {len(covered_chars)}/{len(characters)} 字）"
+            )
+            if pre_render:
+                rendered = render_glyph_images(
+                    covered_chars, font_path, html_dir / images_dirname / item["slug"],
+                )
+                for ch, filename in rendered.items():
+                    entry["images"].setdefault(f"{ord(ch):x}", []).append(filename)
+                print(f"已预渲染 {item['name']} 集字图片：{len(rendered)} 字")
+        # wikichina 集字图（<字>/<别名>-*.png，回退 .jpg）
+        copied = 0
+        for ch in characters:
+            prefix = f"{ord(ch):x}"
+            files: list[Path] = []
+            for alias in item.get("aliases", []):
+                files.extend(sorted((calligraphy_dir / ch).glob(f"{alias}-*.png")))
+            if not files:
+                for alias in item.get("aliases", []):
+                    files.extend(sorted((calligraphy_dir / ch).glob(f"{alias}-*.jpg")))
+            for index, source in enumerate(files):
+                target = html_dir / images_dirname / item["slug"] / f"{prefix}-{index}.png"
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, target)
+                entry["images"].setdefault(prefix, []).append(target.name)
+                copied += 1
+        if copied:
+            print(f"已复制 {item['name']} wikichina 集字图：{copied} 张 → {images_dirname}/{item['slug']}/")
+        resolved.append(entry)
     return resolved
 
 
@@ -474,7 +533,8 @@ HTML_TEMPLATE = """<!doctype html>
       font-size: 11px; letter-spacing: 0.14em;
     }}
     .calligrapher-figure .glyph-stage {{
-      display: grid; place-items: center;
+      display: flex; flex-wrap: wrap; gap: 12px;
+      align-items: center; justify-content: center;
       min-height: 240px;
       border: 1px solid var(--line);
       border-radius: 11px;
@@ -484,7 +544,8 @@ HTML_TEMPLATE = """<!doctype html>
         linear-gradient(90deg, rgba(126, 105, 72, 0.06) 1px, transparent 1px);
       background-size: 50% 50%;
     }}
-    .calligrapher-figure img {{
+    .calligrapher-figure img,
+    .calligrapher-figure .glyph-canvas {{
       width: min(220px, 60vw); height: auto;
       user-select: none;
     }}
@@ -513,7 +574,10 @@ HTML_TEMPLATE = """<!doctype html>
 </html>
 """
 
-MODAL_TEMPLATE = """<div class="glyph-modal" id="glyph-modal" hidden>
+MODAL_TEMPLATE = """<style>
+{font_faces}
+</style>
+<div class="glyph-modal" id="glyph-modal" hidden>
   <div class="glyph-dialog" role="dialog" aria-modal="true" aria-labelledby="glyph-modal-title">
     <header>
       <h2><span id="glyph-modal-char">—</span><small id="glyph-modal-ids"></small></h2>
@@ -537,9 +601,53 @@ MODAL_TEMPLATE = """<div class="glyph-modal" id="glyph-modal" hidden>
     if (lastFocus) lastFocus.focus();
   }}
 
+  // 用书家字体在 Canvas 上实时绘制大字（矢量，任意尺寸清晰）
+  function renderFontStage(stage, c, char) {{
+    var css = 220;
+    var dpr = window.devicePixelRatio || 1;
+    var canvas = document.createElement("canvas");
+    canvas.className = "glyph-canvas";
+    canvas.width = canvas.height = Math.round(css * dpr);
+    canvas.style.width = canvas.style.height = css + "px";
+    var ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    function paint() {{
+      ctx.clearRect(0, 0, css, css);
+      // 米字格
+      ctx.strokeStyle = "rgba(126, 105, 72, 0.28)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(css / 2, 0); ctx.lineTo(css / 2, css);
+      ctx.moveTo(0, css / 2); ctx.lineTo(css, css / 2);
+      ctx.moveTo(0, 0); ctx.lineTo(css, css);
+      ctx.moveTo(css, 0); ctx.lineTo(0, css);
+      ctx.stroke();
+      // 大字
+      ctx.fillStyle = "#1c1b18";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = Math.floor(css * 0.72) + 'px "gx-' + c.slug + '"';
+      ctx.fillText(char, css / 2, css / 2 + css * 0.04);
+    }}
+    if (document.fonts && document.fonts.load) {{
+      document.fonts.load('300px "gx-' + c.slug + '"', char).then(paint, paint);
+    }} else {{
+      paint();
+    }}
+    stage.append(canvas);
+  }}
+
+  function missingNotice(stage, c, char) {{
+    stage.append(Object.assign(document.createElement("p"), {{
+      className: "glyph-missing",
+      textContent: "「" + char + "」暂无 " + c.name + " 集字",
+    }}));
+  }}
+
   function open(span) {{
     var char = span.getAttribute("data-char");
     var ids = span.getAttribute("data-ids") || "";
+    var hex = char.codePointAt(0).toString(16);
     lastFocus = span;
     charLabel.textContent = char;
     idsLabel.textContent = ids ? "IDS " + ids : "";
@@ -551,18 +659,17 @@ MODAL_TEMPLATE = """<div class="glyph-modal" id="glyph-modal" hidden>
       caption.textContent = c.name;
       var stage = document.createElement("div");
       stage.className = "glyph-stage";
-      var image = document.createElement("img");
-      image.alt = c.name + " " + char;
-      image.loading = "lazy";
-      image.src = "glyph-images/" + c.slug + "/" +
-        char.codePointAt(0).toString(16) + ".png";
-      image.addEventListener("error", function () {{
-        stage.replaceChildren(Object.assign(document.createElement("p"), {{
-          className: "glyph-missing",
-          textContent: "「" + char + "」未被 " + c.name + " 字体收录",
-        }}));
+      var hasFont = c.font && c.covered && c.covered.indexOf(hex) >= 0;
+      var images = (c.images && c.images[hex]) || [];
+      if (hasFont) renderFontStage(stage, c, char);
+      images.forEach(function (filename) {{
+        var image = document.createElement("img");
+        image.alt = c.name + " " + char;
+        image.loading = "lazy";
+        image.src = "glyph-images/" + c.slug + "/" + filename;
+        stage.append(image);
       }});
-      stage.append(image);
+      if (!hasFont && !images.length) missingNotice(stage, c, char);
       figure.append(caption, stage);
       body.append(figure);
     }});
@@ -673,9 +780,21 @@ def render_html(datasets: list[dict], calligraphers: list[dict] | None = None) -
     sources = "、".join(data["source"] for data in datasets)
     modal = ""
     if calligraphers:
+        font_faces = "\n".join(
+            f"@font-face {{ font-family: 'gx-{html.escape(c['slug'], quote=True)}';"
+            f" src: url('{html.escape(c['font'])}'); }}"
+            for c in calligraphers if c.get("font")
+        )
         modal = MODAL_TEMPLATE.format(
+            font_faces=font_faces,
             calligraphers_json=json.dumps(
-                [{"name": c["name"], "slug": c["slug"]} for c in calligraphers],
+                [{
+                    "name": c["name"],
+                    "slug": c["slug"],
+                    "font": c.get("font"),
+                    "covered": c.get("covered") or [],
+                    "images": c.get("images") or {},
+                } for c in calligraphers],
                 ensure_ascii=False,
             ),
         )
@@ -705,7 +824,15 @@ def main() -> None:
     parser.add_argument("--html", help="输出 HTML 网格页到指定文件")
     parser.add_argument(
         "--no-images", action="store_true",
-        help="不渲染书家集字图片（弹窗功能依赖图片）",
+        help="不准备弹窗集字资源（字体与集字图都不拷贝）",
+    )
+    parser.add_argument(
+        "--pre-render", action="store_true",
+        help="额外用书家字体预渲染 PNG（默认只拷字体文件由弹窗实时渲染）",
+    )
+    parser.add_argument(
+        "--calligraphy-dir", default=str(ROOT / "data" / "calligraphy"),
+        help="wikichina 集字图目录（默认 data/calligraphy/）",
     )
     parser.add_argument("--ids-dir", default=str(IDS_DIR), help="IDS 数据目录（默认 data/ids/）")
     args = parser.parse_args()
@@ -755,12 +882,14 @@ def main() -> None:
         print(f"已写出 {args.json}")
     if args.html:
         html_path = Path(args.html)
-        # 集字图片：为所有数据集中出现过的字渲染，输出到 HTML 同目录
+        # 弹窗资源：字体拷贝 + 集字图收集，输出到 HTML 同目录
         resolved_calligraphers: list[dict] = []
         if not args.no_images:
             all_chars = sorted({e["char"] for d in datasets for e in d["entries"]})
-            resolved_calligraphers = prepare_calligrapher_images(
+            resolved_calligraphers = prepare_calligrapher_resources(
                 all_chars, html_path.resolve().parent,
+                calligraphy_dir=Path(args.calligraphy_dir),
+                pre_render=args.pre_render,
             )
         html_path.write_text(
             render_html(datasets, resolved_calligraphers),

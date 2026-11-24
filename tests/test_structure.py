@@ -118,19 +118,56 @@ def test_modal_markup_and_glyph_attributes():
     ids_data = load_data()
     entries = structure.analyze_text("明森", ids_data)
     data = structure.to_json(entries, "demo.txt")
-    html = structure.render_html([data], [{"name": "欧体", "slug": "outi"}])
-    # 弹窗容器与书家数据注入
+    resources = [
+        {
+            "name": "欧体", "slug": "outi",
+            "font": "fonts/outi.ttf",
+            "covered": [f"{ord('明'):x}"],
+            "images": {f"{ord('明'):x}": ["660e-0.png"]},
+        },
+    ]
+    html = structure.render_html([data], resources)
+    # 弹窗容器、@font-face 与书家数据注入
     assert 'id="glyph-modal"' in html
-    assert '"欧体"' in html and '"slug":"outi"' in html.replace(" ", "")
-    # 字格带 data-char 与 data-ids，弹窗 JS 按码点拼图片路径
+    assert "@font-face" in html and "fonts/outi.ttf" in html
+    assert "gx-outi" in html
+    # Canvas 实时渲染：按码点查 covered，绘制米字格与大字
+    assert "getContext" in html and "fillText" in html
+    assert "devicePixelRatio" in html
+    # 字格带 data-char 与 data-ids
     assert 'data-char="明"' in html and 'data-ids="⿰日月"' in html
-    assert "codePointAt" in html and "glyph-images/" in html
-    # Esc / 遮罩点击关闭，缺字回退提示
-    assert "Escape" in html and "未被" in html
+    # 集字图并列展示
+    assert "660e-0.png" in html
+    # 缺字回退提示
+    assert "暂无" in html
     # 未提供书家时不注入弹窗 DOM（仅 CSS 类名存在）
     plain = structure.render_html([data])
     assert 'id="glyph-modal"' not in plain
     assert "codePointAt" not in plain
+
+
+def test_prepare_calligrapher_resources(tmp_path, monkeypatch):
+    ids_data = load_data()
+    characters = ["明"]
+    html_dir = tmp_path / "site"
+    html_dir.mkdir()
+    # 用真实 CALLIGRAPHERS 配置但屏蔽 fc-match（无字体环境也能跑通集字图部分）
+    monkeypatch.setattr(structure, "resolve_font_file", lambda family: None)
+    # 伪造 wikichina 集字图目录
+    src = tmp_path / "calligraphy" / "明"
+    src.mkdir(parents=True)
+    (src / "歐陽詢-1.png").write_bytes(b"fake-png")
+    (src / "歐陽詢-2.png").write_bytes(b"fake-png-2")
+    resources = structure.prepare_calligrapher_resources(
+        characters, html_dir, calligraphy_dir=tmp_path / "calligraphy",
+    )
+    assert len(resources) == len(structure.CALLIGRAPHERS)
+    outi = next(r for r in resources if r["slug"] == "outi")
+    # 无字体：font 为空，covered 为空
+    assert outi["font"] is None and outi["covered"] == []
+    # 集字图按码点归档：660e-0.png / 660e-1.png
+    assert outi["images"][f"{ord('明'):x}"] == ["660e-0.png", "660e-1.png"]
+    assert (html_dir / "glyph-images" / "outi" / "660e-0.png").read_bytes() == b"fake-png"
 
 
 def test_render_glyph_images(tmp_path):
