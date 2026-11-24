@@ -89,3 +89,24 @@ npm run android:apk             # 构建离线资源并编译 release APK（需�
 
 构建时只会打包你有权分发的字体。默认字体文件被 `.gitignore` 忽略，避免把本地字体误公开发布。
 
+### 楷书集字图爬取（scripts/fetch-calligraphy.py）
+
+从 [wikichina 书法字典](https://tool.wikichina.com/shufa/) 批量下载历代楷书大家（欧阳询、颜真卿、柳公权、褚遂良等 11 位）的集字图，作为弹窗图片来源的补充方案：
+
+```bash
+# 从词表批量下载（默认限速 1.5s + 随机抖动，礼貌爬取）
+python3 scripts/fetch-calligraphy.py --file level-1.txt --out data/calligraphy
+
+# 同时下载 WMF 矢量图并转成 512px PNG（需 sudo apt install libwmf-bin）
+python3 scripts/fetch-calligraphy.py --file level-1.txt --wmf --convert
+
+# 只测试几个字，加 --limit；指定书家用 --authors 歐陽詢,顏真卿（繁体）
+python3 scripts/fetch-calligraphy.py 明 --limit 3
+```
+
+- 楷书筛选：站点无书体参数，脚本按条目"作者"字段匹配楷书大家名单（`DEFAULT_MASTERS`）
+- 输出结构：`data/calligraphy/<字>/<书家>-<序号>.jpg|.wmf|.png`，`manifest.json` 记录进度
+- 断点续传：已存在的文件自动跳过，重跑安全
+- JPG 预览约 74px（小）；WMF 为矢量原图，经 `wmf2gd --maxpect` 可渲染任意尺寸高清 PNG
+
+
