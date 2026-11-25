@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.concurrent.ExecutorService;
@@ -189,8 +190,10 @@ public class AppUpdaterPlugin extends Plugin {
             call.reject("没有已下载并通过校验的更新");
             return;
         }
-        // Android 8+ requires the user to allow installs from this app once.
-        if (!context.getPackageManager().canRequestPackageInstalls()) {
+        // Android 8+ requires the user to allow installs from this app once;
+        // older versions install unknown sources without this permission.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+            && !context.getPackageManager().canRequestPackageInstalls()) {
             try {
                 activity.startActivity(new Intent(
                     android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
@@ -218,7 +221,11 @@ public class AppUpdaterPlugin extends Plugin {
     // ---- Helpers ------------------------------------------------------------
 
     private HttpURLConnection open(URL url) throws IOException {
-        UpdatePolicy.assertAllowed(url.toURI());
+        try {
+            UpdatePolicy.assertAllowed(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException("更新地址无效", e);
+        }
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setConnectTimeout(CONNECT_TIMEOUT);
         connection.setReadTimeout(READ_TIMEOUT);
@@ -248,9 +255,18 @@ public class AppUpdaterPlugin extends Plugin {
                 java.io.InputStream stream = status >= 400
                     ? connection.getErrorStream()
                     : connection.getInputStream();
-                String body = stream == null
-                    ? ""
-                    : new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+                String body;
+                if (stream == null) {
+                    body = "";
+                } else {
+                    // InputStream.readAllBytes() 需 API 33+，手动读取兼容低版本
+                    java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+                    byte[] chunk = new byte[8192];
+                    int n;
+                    while ((n = stream.read(chunk)) != -1) buffer.write(chunk, 0, n);
+                    stream.close();
+                    body = new String(buffer.toByteArray(), StandardCharsets.UTF_8);
+                }
                 if (status >= 400) throw new IOException("HTTP " + status);
                 return body;
             }
