@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import androidx.core.content.FileProvider;
-import androidx.core.content.pm.PackageInfoCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -50,7 +50,10 @@ public class AppUpdaterPlugin extends Plugin {
         try {
             PackageInfo info = context.getPackageManager()
                 .getPackageInfo(context.getPackageName(), 0);
-            data.put("versionCode", PackageInfoCompat.longVersionCode(info));
+            long versionCode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+                ? info.getLongVersionCode()
+                : info.versionCode;
+            data.put("versionCode", versionCode);
             data.put("versionName", info.versionName == null ? "" : info.versionName);
         } catch (PackageManager.NameNotFoundException e) {
             call.reject("无法读取当前应用信息");
