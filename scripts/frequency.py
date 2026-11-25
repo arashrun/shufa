@@ -29,8 +29,8 @@ import structure  # noqa: E402  复用弹窗模板与资源准备逻辑
 #   aliases = wikichina 集字图作者名（繁体），匹配 data/calligraphy/<字>/ 下的图
 CALLIGRAPHERS = [
     {"name": "行楷", "slug": "xingkai", "family": "绿木屐JXP行楷", "aliases": []},
-    {"name": "欧体", "slug": "outi", "family": "欧阳询书法字体", "aliases": ["歐陽詢"]},
-    {"name": "规范楷体", "slug": "kaiti", "family": "方正楷体简体", "aliases": []},
+    # {"name": "欧体", "slug": "outi", "family": "欧阳询书法字体", "aliases": ["歐陽詢"]},
+    # {"name": "规范楷体", "slug": "kaiti", "family": "方正楷体简体", "aliases": []},
 ]
 
 GRID_COLUMNS = 20  # 每行字数（CSS 网格会自适应，仅用于占位提示）
