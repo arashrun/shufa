@@ -56,6 +56,25 @@ async function fontStorage(value) {
   } finally { db.close(); }
 }
 
+/** 校验字体文件魔数，给出可读的错误提示。 */
+function validateFontBytes(bytes) {
+  const view = new DataView(bytes);
+  if (bytes.byteLength < 12) throw new Error("文件太小，不像字体文件");
+  const tag = String.fromCharCode(
+    view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3),
+  );
+  if (tag === "\x00\x01\x00\x00" || tag === "true" || tag === "ttcf") return;
+  if (tag === "OTTO") return;
+  if (tag === "wOFF") return;
+  if (tag === "wOF2") return;
+  // 常见损坏情形：微信传输改写头部（会变成 ZIP/媒体文件等）
+  if (tag === "PK\x03\x04") throw new Error("这是 zip 压缩包，请先解压再导入");
+  throw new Error(
+    `文件头 ${tag.replace(/[^\x20-\x7e]/g, "?")} 不是字体格式，`
+    + "文件可能在传输中被改写（微信/QQ 传输常见），请改用数据线或 zip 压缩后传输",
+  );
+}
+
 async function activateFont(bytes) {
   const face = new FontFace("XingkaiOffline", bytes);
   await face.load();
@@ -86,6 +105,7 @@ find("font-import").addEventListener("change", async (event) => {
   try {
     if (file.size > 40 * 1024 * 1024) throw new Error("字体文件不能超过 40 MB");
     const bytes = await file.arrayBuffer();
+    validateFontBytes(bytes);
     await activateFont(bytes);
     await fontStorage(bytes);
     find("font-status").textContent = `已保存离线字体：${file.name}`;
