@@ -20,7 +20,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-import structure  # noqa: E402  复用书家配置、弹窗模板与资源准备
+import structure  # noqa: E402  复用弹窗模板与资源准备逻辑
+
+# 字频表弹窗书家配置（独立于 structure.py 的 CALLIGRAPHERS，按需增删）：
+#   name    = 弹窗显示名
+#   slug    = 资源目录名（fonts/ 下）
+#   family  = 本机字体族名（fc-match 解析），留空 family 则跳过该字体
+#   aliases = wikichina 集字图作者名（繁体），匹配 data/calligraphy/<字>/ 下的图
+CALLIGRAPHERS = [
+    {"name": "行楷", "slug": "xingkai", "family": "绿木屐JXP行楷", "aliases": []},
+    {"name": "欧体", "slug": "outi", "family": "欧阳询书法字体", "aliases": ["歐陽詢"]},
+    {"name": "规范楷体", "slug": "kaiti", "family": "方正楷体简体", "aliases": []},
+]
 
 GRID_COLUMNS = 20  # 每行字数（CSS 网格会自适应，仅用于占位提示）
 
@@ -174,6 +185,10 @@ def main() -> None:
         "--html", default="tools/frequency/index.html", help="输出 HTML 路径",
     )
     parser.add_argument("--ids-dir", default=str(structure.IDS_DIR))
+    parser.add_argument(
+        "--calligrapher", action="append", dest="calligraphers", metavar="NAME",
+        help="只启用指定书家（按 name 匹配，可重复）；默认用脚本内 CALLIGRAPHERS 全部",
+    )
     args = parser.parse_args()
 
     if not args.files:
@@ -191,9 +206,16 @@ def main() -> None:
 
     html_path = Path(args.html)
     html_dir = html_path.resolve().parent
-    all_chars = characters  # 全部字都做覆盖检测（字体覆盖表按需注入）
+    calligraphers = CALLIGRAPHERS
+    if args.calligraphers:
+        wanted = set(args.calligraphers)
+        calligraphers = [c for c in CALLIGRAPHERS if c["name"] in wanted]
+        missing = wanted - {c["name"] for c in calligraphers}
+        if missing:
+            raise SystemExit(f"未找到书家：{'、'.join(sorted(missing))}（可选：{'、'.join(c['name'] for c in CALLIGRAPHERS)}）")
     calligraphers = structure.prepare_calligrapher_resources(
-        all_chars, html_dir, calligraphy_dir=ROOT / "data" / "calligraphy",
+        characters, html_dir, calligraphers=calligraphers,
+        calligraphy_dir=ROOT / "data" / "calligraphy",
     )
     html_path.write_text(render_page(characters, calligraphers), encoding="utf-8")
     print(f"已写出 {html_path}（{len(characters)} 字，频序）")

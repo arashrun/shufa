@@ -122,7 +122,11 @@ def is_hanzi_in(text: str) -> bool:
 # ---- 集字图片渲染 ----
 
 def resolve_font_file(family: str) -> Path | None:
-    """通过 fontconfig 把字体族名解析为本机字体文件路径。"""
+    """通过 fontconfig 把字体族名解析为本机字体文件路径。
+
+    fc-match 对不存在的族名也会兜底返回某字体，这里用 fc-scan 校验
+    匹配到的文件确实包含该族名，避免静默用错字体。
+    """
     import shutil
     import subprocess
 
@@ -137,7 +141,23 @@ def resolve_font_file(family: str) -> Path | None:
     except (subprocess.SubprocessError, OSError):
         return None
     path = Path(result.stdout.strip())
-    return path if path.is_file() else None
+    if not path.is_file():
+        return None
+    if shutil.which("fc-scan"):
+        try:
+            scan = subprocess.run(
+                ["fc-scan", "-F", "%{family}", str(path)],
+                capture_output=True, text=True, timeout=15, check=True,
+            )
+            families = scan.stdout.replace(",", "|").split("|")
+            if not any(
+                family.casefold() in known.casefold() for known in families
+            ):
+                print(f"警告：fc-match 把「{family}」兜底到了无关字体 {path.name}，视为未安装", file=sys.stderr)
+                return None
+        except (subprocess.SubprocessError, OSError):
+            pass  # fc-scan 不可用时退回信任 fc-match
+    return path
 
 
 def font_coverage(font_path: Path) -> set[int]:
