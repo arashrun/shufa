@@ -43,14 +43,24 @@ HEADERS = {
     "Referer": INDEX_URL,
 }
 
-# 楷书大家名单（站内使用繁体）
+# 楷书大家名单（站内使用繁体）。注意：王羲之等人的帖拓多为行草，
+# 不列入；其楷书（乐毅论/黄庭经）靠出处白名单补充识别。
 DEFAULT_MASTERS = [
     "歐陽詢", "歐陽通",  # 欧体父子
     "顏真卿",            # 颜体
     "柳公權",            # 柳体
     "趙子昂", "趙孟頫",   # 赵体
-    "褚遂良", "虞世南", "智永", "鍾紹京", "王羲之",
+    "褚遂良", "虞世南", "智永", "鍾紹京",
+    "鄭道昭",            # 魏碑
 ]
+
+# 帖拓无作者时，按朝代+出处识别魏碑楷书（墓志/造像记/碑均为楷书；
+# 同期无隶篆干扰，漢碑隶书因朝代不在名单内自然排除）
+WEIBEI_DYNASTIES = {"北魏", "東魏", "北齊", "西魏", "隋"}
+WEIBEI_SOURCE_KEYWORDS = ("墓誌", "墓志", "造像記", "造像记", "碑")
+
+# 行草大家楷书帖白名单（作者不在上名单时靠出处识别）
+KAISHU_SOURCE_WHITELIST = ("樂毅論", "黄庭經", "黃庭經", "東方朔")
 
 
 def fetch(url: str, timeout: int = 30) -> bytes:
@@ -69,11 +79,14 @@ def query_character(character: str) -> str:
 def parse_entries(html: str) -> list[dict]:
     """解析查询结果，返回矢量字条目 [{image, wmf, author, dynasty, source}]。"""
     entries: list[dict] = []
-    # 条目结构：<a href="down.asp?url=images/sl\7\7-83.WMF&zhi=山"><img src=images/sl\7\7-83.jpg title=...>
+    # 条目：<a href="down.asp?url=images/sl\7\7-83.WMF&zhi=山"><img src=images/sl\7\7-83.jpg
+    #        title=点击下载矢量字山朝代：東晉 作者：王羲之 出处:蘭亭序 >
     pattern = re.compile(
         r'href="?down\.asp\?url=(?P<wmf>[^"&> ]+)'
         r'[^>]*>\s*<img src=?"?(?P<image>images/sl[^" >]+\.jpg)"?'
-        r'[^>]*title=[^>]*>.*?作者：(?P<author>[^<\s]*)',
+        r'[^>]*title="?[^"]*?(?:朝代|dynasty)：(?P<dynasty>[^ <\s]*)'
+        r'\s*作者：(?P<author>[^<\s]*)'
+        r'[^"]*?出处:\s*(?P<source>[^">]*)"?',
         re.S,
     )
     for match in pattern.finditer(html):
@@ -81,12 +94,26 @@ def parse_entries(html: str) -> list[dict]:
             "image": match.group("image").replace("\\", "/"),
             "wmf": match.group("wmf").replace("\\", "/"),
             "author": match.group("author").strip(),
+            "dynasty": match.group("dynasty").strip(),
+            "source": match.group("source").strip().rstrip("> "),
         })
     return entries
 
 
+def is_kaishu(entry: dict, masters: list[str]) -> bool:
+    """判断帖拓条目是否楷书：书家作者 / 魏碑墓志造像 / 楷书帖白名单。"""
+    if entry["author"] in masters:
+        return True
+    if (
+        entry["dynasty"] in WEIBEI_DYNASTIES
+        and any(k in entry["source"] for k in WEIBEI_SOURCE_KEYWORDS)
+    ):
+        return True  # 无作者的北魏墓志/造像记均为魏碑楷书
+    return any(k in entry["source"] for k in KAISHU_SOURCE_WHITELIST)
+
+
 def filter_masters(entries: list[dict], masters: list[str]) -> list[dict]:
-    return [e for e in entries if e["author"] in masters]
+    return [e for e in entries if is_kaishu(e, masters)]
 
 
 def download(url: str, target: Path, delay: float, jitter: float) -> bool:
@@ -135,7 +162,7 @@ def fetch_character(
 
     stats = {"character": character, "downloaded": 0, "skipped": 0, "total": len(entries)}
     for index, entry in enumerate(entries):
-        author = entry["author"]
+        author = entry["author"] or "魏碑"
         image_path = character_dir / f"{author}-{index}.jpg"
         url = BASE + entry["image"]
         if download(url, image_path, delay, jitter):
