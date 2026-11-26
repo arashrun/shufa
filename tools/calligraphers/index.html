@@ -29,15 +29,19 @@ header.page p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
 nav.toc {
   position: sticky; top: 0; z-index: 5;
   background: rgba(247, 242, 232, 0.96); border-bottom: 1px solid var(--line);
-  padding: 8px 12px;
+  padding: 8px 12px; max-height: 40vh; overflow-y: auto;
 }
-nav.toc ul {
-  margin: 0; padding: 0; list-style: none;
-  display: flex; flex-wrap: wrap; gap: 4px 14px;
+nav.toc ul { margin: 0; padding: 0; list-style: none; }
+nav.toc > ul { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+nav.toc li.era > span {
+  color: var(--cinnabar); font-size: 13px; letter-spacing: 0.2em;
+  border-bottom: 1px solid var(--line); padding-bottom: 1px;
 }
+nav.toc li.era > ul { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 3px; }
 nav.toc a { color: var(--ink); text-decoration: none; font-size: 14px; }
 nav.toc a:hover { color: var(--cinnabar); }
 main { max-width: 720px; margin: 0 auto; padding: 0 16px 64px; }
+main.work { max-width: 720px; margin: 0 auto; padding: 24px 16px 64px; }
 article.calligrapher { border-bottom: 1px solid var(--line); padding: 28px 0 20px; }
 article.calligrapher h2 {
   margin: 0 0 4px; font-size: 24px; letter-spacing: 0.25em; color: var(--cinnabar);
@@ -54,6 +58,11 @@ section.bio li {
   margin: 10px 0; padding-left: 1.2em; text-indent: -1.2em; text-align: justify;
 }
 section.bio li::before { content: "◦ "; color: var(--cinnabar); }
+section.bio a { color: var(--cinnabar); text-decoration: none; border-bottom: 1px dotted var(--cinnabar); }
+main.work section.bio p { font-size: 18px; }
+small { color: var(--muted); font-size: 0.62em; }
+p.back { text-align: center; }
+p.back a { color: var(--muted); text-decoration: none; }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }
@@ -66,12 +75,22 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
 </header>
 <nav class="toc">
   <ul>
+    <li class="era"><span>魏晋</span>
+      <ul>
       <li><a href="#c-01-zhongyao">钟繇</a></li>
       <li><a href="#c-02-weifuren">卫夫人</a></li>
       <li><a href="#c-03-wangxizhi">王羲之</a></li>
       <li><a href="#c-04-wangxianzhi">王献之</a></li>
       <li><a href="#c-05-wangxun">王珣</a></li>
+      </ul>
+    </li>
+    <li class="era"><span>隋</span>
+      <ul>
       <li><a href="#c-06-zhiyong">智永</a></li>
+      </ul>
+    </li>
+    <li class="era"><span>唐 · 五代</span>
+      <ul>
       <li><a href="#c-07-ouyangxun">欧阳询</a></li>
       <li><a href="#c-08-yushinan">虞世南</a></li>
       <li><a href="#c-09-chusuilang">褚遂良</a></li>
@@ -81,15 +100,27 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
       <li><a href="#c-13-yanzhenqing">颜真卿</a></li>
       <li><a href="#c-14-liugongquan">柳公权</a></li>
       <li><a href="#c-15-yangningshi">杨凝式</a></li>
+      </ul>
+    </li>
+    <li class="era"><span>两宋</span>
+      <ul>
       <li><a href="#c-16-lijianzhong">李建中</a></li>
       <li><a href="#c-17-caixiang">蔡襄</a></li>
       <li><a href="#c-18-sushi">苏轼</a></li>
       <li><a href="#c-19-huangtingjian">黄庭坚</a></li>
       <li><a href="#c-20-mifu">米芾</a></li>
+      </ul>
+    </li>
+    <li class="era"><span>元</span>
+      <ul>
       <li><a href="#c-21-zhaomengfu">赵孟頫</a></li>
       <li><a href="#c-22-xianyushu">鲜于枢</a></li>
       <li><a href="#c-23-kangli-naonao">康里巎巎</a></li>
       <li><a href="#c-24-yangweizhen">杨维桢</a></li>
+      </ul>
+    </li>
+    <li class="era"><span>明</span>
+      <ul>
       <li><a href="#c-25-zhuyunming">祝允明</a></li>
       <li><a href="#c-26-wenzhengming">文徵明</a></li>
       <li><a href="#c-27-wangchong">王宠</a></li>
@@ -97,17 +128,26 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
       <li><a href="#c-29-zhangruitu">张瑞图</a></li>
       <li><a href="#c-30-huangdaozhou">黄道周</a></li>
       <li><a href="#c-31-niyuanlu">倪元璐</a></li>
+      </ul>
+    </li>
+    <li class="era"><span>明清之际</span>
+      <ul>
       <li><a href="#c-32-wangduo">王铎</a></li>
       <li><a href="#c-33-fushan">傅山</a></li>
+      </ul>
+    </li>
+    <li class="era"><span>清 · 近代</span>
+      <ul>
       <li><a href="#c-34-liuyong">刘墉</a></li>
       <li><a href="#c-35-hesaoji">何绍基</a></li>
       <li><a href="#c-36-zhaozhiqian">赵之谦</a></li>
       <li><a href="#c-37-wuchangshuo">吴昌硕</a></li>
       <li><a href="#c-38-shenyinmo">沈尹默</a></li>
       <li><a href="#c-39-qigong">启功</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
-<main>
   <article class="calligrapher" id="c-01-zhongyao">
     <h2>钟繇</h2>
     <section class="bio">
@@ -117,7 +157,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《宣示表》：小楷代表作，传为王羲之临本刻入《淳化阁帖》，笔法端严古雅。</li>
+      <li><a href="works/xuanshibiao.html">《宣示表》</a>：小楷代表作，传为王羲之临本刻入《淳化阁帖》，笔法端严古雅。</li>
       <li>《荐季直表》：传世墨迹本，笔势温厚，结体宽博。</li>
       <li>《贺捷表》：楷中带行，古朴灵动。</li>
       </ul>
@@ -132,7 +172,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《笔阵图》：书论名篇（传），论七种基本笔画的意象，是习字者最早的笔法教材之一。</li>
+      <li><a href="works/bizhentu.html">《笔阵图》</a>：书论名篇（传），论七种基本笔画的意象，是习字者最早的笔法教材之一。</li>
       <li>《急就帖》：传世刻帖，真迹无存，见诸历代丛帖。</li>
       </ul>
     </section>
@@ -146,10 +186,10 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《兰亭序》：天下第一行书，永和九年会稽兰亭雅集所书，二十八行三百二十四字，凡重字皆变其体。</li>
-      <li>《快雪时晴帖》：行书短札，乾隆列为「三希」之首。</li>
-      <li>《丧乱帖》：唐摹本，行草，笔势顿挫郁勃。</li>
-      <li>《圣教序》（集字）：怀仁集王字刻石，为学行书最重要的范本之一。</li>
+      <li><a href="works/lantingxu.html">《兰亭序》</a>：天下第一行书，永和九年会稽兰亭雅集所书，二十八行三百二十四字，凡重字皆变其体。</li>
+      <li><a href="works/kuaixue.html">《快雪时晴帖》</a>：行书短札，乾隆列为「三希」之首。</li>
+      <li><a href="works/sangluan.html">《丧乱帖》</a>：唐摹本，行草，笔势顿挫郁勃。</li>
+      <li><a href="works/shengjiaoxu.html">《圣教序》</a>（集字）：怀仁集王字刻石，为学行书最重要的范本之一。</li>
       <li>《黄庭经》《乐毅论》：小楷名品。</li>
       </ul>
     </section>
@@ -163,8 +203,8 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《中秋帖》：传为米芾临本，行草连绵，被誉为「一笔书」之祖，「三希」之一。</li>
-      <li>《鸭头丸帖》：行草真迹摹本，笔速迅疾，全帖十余字而气象万千。</li>
+      <li><a href="works/zhongqiu.html">《中秋帖》</a>：传为米芾临本，行草连绵，被誉为「一笔书」之祖，「三希」之一。</li>
+      <li><a href="works/yatouwan.html">《鸭头丸帖》</a>：行草真迹摹本，笔速迅疾，全帖十余字而气象万千。</li>
       <li>《洛神赋十三行》：小楷，刻本称「玉版十三行」，秀逸开张。</li>
       </ul>
     </section>
@@ -178,7 +218,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《伯远帖》：行书真迹，纸本，四十七字，笔致潇洒古淡，历来为行书取法的重要实物，现藏故宫博物院。</li>
+      <li><a href="works/boyuan.html">《伯远帖》</a>：行书真迹，纸本，四十七字，笔致潇洒古淡，历来为行书取法的重要实物，现藏故宫博物院。</li>
       </ul>
     </section>
   </article>
@@ -191,7 +231,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《真草千字文》（墨迹本）：日本藏唐摹本与关中本刻石，真书圆融温润，是学习楷书与草书转换的经典范本。</li>
+      <li><a href="works/qianziwen.html">《真草千字文》</a>（墨迹本）：日本藏唐摹本与关中本刻石，真书圆融温润，是学习楷书与草书转换的经典范本。</li>
       </ul>
     </section>
   </article>
@@ -204,7 +244,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《九成宫醴泉铭》：楷书第一经典，贞观六年书丹，用笔方整，结体内敛险峻，后世习楷多由此入门。</li>
+      <li><a href="works/jiuchenggong.html">《九成宫醴泉铭》</a>：楷书第一经典，贞观六年书丹，用笔方整，结体内敛险峻，后世习楷多由此入门。</li>
       <li>《化度寺碑》：结构精紧，历来评价甚高，被认为不下于《九成宫》。</li>
       <li>《虞恭公碑》《皇甫诞碑》：欧体小楷与中楷的另两种面貌。</li>
       <li>《卜商帖》《张翰帖》：行书墨迹。</li>
@@ -236,7 +276,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
       <ul>
       <li>《雁塔圣教序》：褚书晚年代表，笔法空灵瘦劲，为习褚首选。</li>
       <li>《孟法师碑》：兼有欧虞法度，较为平正。</li>
-      <li>《阴符经》（传）：大字楷书墨迹，笔势跌宕。</li>
+      <li><a href="works/yinfujing.html">《阴符经》</a>（传）：大字楷书墨迹，笔势跌宕。</li>
       <li>《倪宽赞》（传）：小楷墨迹，清秀舒展。</li>
       </ul>
     </section>
@@ -294,7 +334,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
       <li>《多宝塔碑》：颜体早期作品，用笔规范清晰，是入门颜体最常用的碑帖。</li>
       <li>《颜勤礼碑》：晚年代表作，雄浑苍劲，颜体典型。</li>
       <li>《颜氏家庙碑》：晚岁最厚重之作，人书俱老。</li>
-      <li>《祭侄文稿》：天下第二行书，安史之乱中为侄季明所书祭稿，情绪激愤，涂改满纸而真气弥漫。</li>
+      <li><a href="works/jizhigao.html">《祭侄文稿》</a>：天下第二行书，安史之乱中为侄季明所书祭稿，情绪激愤，涂改满纸而真气弥漫。</li>
       <li>《争座位帖》：行书信稿刻本，与《祭侄文稿》同气。</li>
       </ul>
     </section>
@@ -322,7 +362,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《韭花帖》：睡起得韭花佐饭之佳而致谢书札，行楷疏朗，字距行距极大，散淡空灵，为千古名迹。</li>
+      <li><a href="works/jiuhua.html">《韭花帖》</a>：睡起得韭花佐饭之佳而致谢书札，行楷疏朗，字距行距极大，散淡空灵，为千古名迹。</li>
       <li>《卢鸿草堂十志图跋》：笔势沉雄苍茫。</li>
       <li>《神仙起居法》：行草连绵，纵横恣肆。</li>
       </ul>
@@ -366,8 +406,8 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《寒食帖》：天下第三行书，黄州寒食诗二首，随情绪起伏笔画大小悬殊，被黄庭坚誉为「兼其骨气、兼其神采」。</li>
-      <li>《前赤壁赋》：行楷长卷，端庄流丽。</li>
+      <li><a href="works/hanshitie.html">《寒食帖》</a>：天下第三行书，黄州寒食诗二首，随情绪起伏笔画大小悬殊，被黄庭坚誉为「兼其骨气、兼其神采」。</li>
+      <li><a href="works/qianchibifu.html">《前赤壁赋》</a>：行楷长卷，端庄流丽。</li>
       <li>《洞庭春色赋·中山松醪赋》：晚年行书合并长卷。</li>
       <li>《一夜帖》《人来得书帖》：行书尺牍。</li>
       </ul>
@@ -382,7 +422,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《松风阁诗帖》：行书代表，笔画舒展，波势明显。</li>
+      <li><a href="works/songfengge.html">《松风阁诗帖》</a>：行书代表，笔画舒展，波势明显。</li>
       <li>《经伏波神祠诗卷》：行书长卷，苍劲老辣。</li>
       <li>《寒食帖跋》：与苏书合璧，行书遒媚。</li>
       <li>《诸上座帖》《李白忆旧游诗卷》：草书巨迹。</li>
@@ -400,7 +440,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
       <ul>
       <li>《蜀素帖》：书于乌丝栏织绢上，行书代表，笔势跳荡灵动。</li>
       <li>《苕溪诗帖》：行书长卷，中年力作。</li>
-      <li>《研山铭》：大字行书，沉雄飞动。</li>
+      <li><a href="works/yanshanming.html">《研山铭》</a>：大字行书，沉雄飞动。</li>
       <li>《向太后挽词》：小楷。</li>
       <li>《多景楼诗帖》：大字行书。</li>
       </ul>
@@ -417,8 +457,8 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
       <ul>
       <li>《胆巴碑》：赵体大楷代表，风华整丽。</li>
       <li>《妙严寺记》：楷书墨迹，端稳圆劲。</li>
-      <li>《洛神赋》：行书名迹，遒媚姿媚。</li>
-      <li>《前后赤壁赋》：行书长卷，圆转流美。</li>
+      <li><a href="works/luoshenfu.html">《洛神赋》</a>：行书名迹，遒媚姿媚。</li>
+      <li><a href="works/houchibifu.html">《前后赤壁赋》</a>：行书长卷，圆转流美。</li>
       <li>《汲黯传》：小楷经典，直追晋唐。</li>
       </ul>
     </section>
@@ -492,7 +532,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
       <h3>作品集</h3>
       <ul>
       <li>《琴赋》：小楷代表作，法度精严。</li>
-      <li>《滕王阁序》：行书名迹。</li>
+      <li><a href="works/tengwanggexu.html">《滕王阁序》</a>：行书名迹。</li>
       <li>《赤壁赋》扇面诸作：行书小字，精雅之至。</li>
       <li>《西苑诗卷》：行书大字长卷。</li>
       </ul>
@@ -522,7 +562,7 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
     <section class="bio">
       <h3>作品集</h3>
       <ul>
-      <li>《琵琶行》：行书长卷。</li>
+      <li><a href="works/pipaxing.html">《琵琶行》</a>：行书长卷。</li>
       <li>《烟江叠嶂图跋》：行书，疏朗萧散。</li>
       <li>《昼锦堂记》：行书大字长卷。</li>
       </ul>
@@ -692,6 +732,5 @@ section.bio li::before { content: "◦ "; color: var(--cinnabar); }
       </ul>
     </section>
   </article>
-</main>
 </body>
 </html>

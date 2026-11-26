@@ -30,18 +30,31 @@ for (const entry of await readdir(toolsSource, { withFileTypes: true })) {
     continue;
   }
   // 工具页深度为 tools/<name>/，导航脚本用 data-root 指回站点根
-  let html = await readFile(resolve(toolsSource, entry.name, manifest.entry), "utf8");
-  html = html.replace(
-    "</head>",
-    '  <link rel="stylesheet" href="../../tools-nav.css" />\n  </head>',
-  );
-  html = html.replace(
-    "</body>",
-    '  <script src="../../tools-nav.js" data-root="../.."></script>\n  </body>',
+  const inject = (html) =>
+    html
+      .replace(
+        "</head>",
+        '  <link rel="stylesheet" href="../../tools-nav.css" />\n  </head>',
+      )
+      .replace(
+        "</body>",
+        '  <script src="../../tools-nav.js" data-root="../.."></script>\n  </body>',
+      );
+  let html = inject(
+    await readFile(resolve(toolsSource, entry.name, manifest.entry), "utf8"),
   );
   await cp(resolve(toolsSource, entry.name), resolve(toolsOutput, entry.name), {
     recursive: true,
   });
+  // 工具目录内的其他 HTML（如书家谱的作品页）也注入导航
+  for (const extra of await readdir(resolve(toolsOutput, entry.name), {
+    withFileTypes: true,
+  })) {
+    if (extra.isDirectory() || !extra.name.endsWith(".html")) continue;
+    if (extra.name === manifest.entry) continue;
+    const path = resolve(toolsOutput, entry.name, extra.name);
+    await writeFile(path, inject(await readFile(path, "utf8")));
+  }
   await writeFile(resolve(toolsOutput, entry.name, manifest.entry), html);
   tools.push({
     title: manifest.title,
