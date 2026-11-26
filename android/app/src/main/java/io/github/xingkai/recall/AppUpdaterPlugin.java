@@ -82,10 +82,10 @@ public class AppUpdaterPlugin extends Plugin {
             try {
                 URL url = new URL("https://api.github.com/repos/"
                     + UpdatePolicy.repository(repository) + "/releases/latest");
-                HttpURLConnection connection = open(url);
+                HttpURLConnection connection = openFollowing(url);
                 connection.setRequestProperty("Accept", "application/vnd.github+json");
                 int status = connection.getResponseCode();
-                String body = readAll(connection);
+                String body = readBody(connection, status);
                 if (status == 404) {
                     rejectOnUi(call, "更新仓库中还没有发布任何版本");
                     return;
@@ -124,12 +124,12 @@ public class AppUpdaterPlugin extends Plugin {
                 if (!dir.exists() && !dir.mkdirs()) throw new IOException("无法创建更新缓存目录");
 
                 // 1. Fetch the expected checksum published next to the APK.
-                HttpURLConnection checksumConnection = open(new URL(checksumUrl));
-                String expected = UpdatePolicy.checksum(readAll(checksumConnection));
+                String expected = UpdatePolicy.checksum(readAll(new URL(checksumUrl)));
 
                 // 2. Stream the APK to a .part file while hashing it.
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                HttpURLConnection connection = open(new URL(url));
+                // GitHub Release 下载会 302 跳转到 CDN，必须跟随重定向
+                HttpURLConnection connection = openFollowing(new URL(url));
                 long total = connection.getContentLengthLong();
                 long read = 0;
                 int lastPercent = -1;
@@ -158,7 +158,10 @@ public class AppUpdaterPlugin extends Plugin {
                 String actual = hex(digest.digest());
                 if (!actual.equals(expected)) {
                     temp.delete();
-                    throw new IOException("SHA-256 校验失败，已丢弃下载内容");
+                    throw new IOException("SHA-256 校验失败，已丢弃下载内容"
+                        + "（下载 " + (read / 1024) + " KB，期望 "
+                        + expected.substring(0, 8) + "…，实际 "
+                        + actual.substring(0, 8) + "…）");
                 }
                 if (apk.exists() && !apk.delete()) throw new IOException("无法替换旧的更新文件");
                 if (!temp.renameTo(apk)) throw new IOException("无法保存更新文件");
@@ -233,43 +236,59 @@ public class AppUpdaterPlugin extends Plugin {
         return connection;
     }
 
-    /** Fetch a text body, following redirects only within the policy allowlist. */
-    private String readAll(HttpURLConnection connection) throws IOException {
-        try {
-            int redirects = 0;
-            while (true) {
-                int status = connection.getResponseCode();
-                if (status == HttpURLConnection.HTTP_MOVED_PERM
-                    || status == HttpURLConnection.HTTP_MOVED_TEMP
-                    || status == 307 || status == 308) {
-                    if (++redirects > 5) throw new IOException("重定向次数过多");
-                    String location = connection.getHeaderField("Location");
-                    if (location == null) throw new IOException("重定向缺少目标地址");
-                    URL previous = connection.getURL();
-                    connection.disconnect();
-                    URL next = new URL(previous, location);
-                    // Revalidate the redirect target so CDN hops stay allowlisted.
-                    connection = open(next);
-                    continue;
-                }
-                java.io.InputStream stream = status >= 400
-                    ? connection.getErrorStream()
-                    : connection.getInputStream();
-                String body;
-                if (stream == null) {
-                    body = "";
-                } else {
-                    // InputStream.readAllBytes() 需 API 33+，手动读取兼容低版本
-                    java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
-                    byte[] chunk = new byte[8192];
-                    int n;
-                    while ((n = stream.read(chunk)) != -1) buffer.write(chunk, 0, n);
-                    stream.close();
-                    body = new String(buffer.toByteArray(), StandardCharsets.UTF_8);
-                }
-                if (status >= 400) throw new IOException("HTTP " + status);
-                return body;
+    /** Fetch a connection following redirects only within the policy allowlist. */
+    private HttpURLConnection openFollowing(URL url) throws IOException {
+        HttpURLConnection connection = open(url);
+        int redirects = 0;
+        while (true) {
+            int status = connection.getResponseCode();
+            if (status == HttpURLConnection.HTTP_MOVED_PERM
+                || status == HttpURLConnection.HTTP_MOVED_TEMP
+                || status == 307 || status == 308) {
+                if (++redirects > 5) throw new IOException("重定向次数过多");
+                String location = connection.getHeaderField("Location");
+                if (location == null) throw new IOException("重定向缺少目标地址");
+                URL previous = connection.getURL();
+                connection.disconnect();
+                // Revalidate each hop so CDN targets stay allowlisted.
+                connection = open(new URL(previous, location));
+                continue;
             }
+            return connection;
+        }
+    }
+
+    /** Fetch a text body, following redirects only within the policy allowlist. */
+    private String readAll(URL url) throws IOException {
+        HttpURLConnection connection = openFollowing(url);
+        try {
+            int status = connection.getResponseCode();
+            return readBody(connection, status);
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    /** Read the body of an already-opened connection (status already fetched). */
+    private String readBody(HttpURLConnection connection, int status) throws IOException {
+        try {
+            java.io.InputStream stream = status >= 400
+                ? connection.getErrorStream()
+                : connection.getInputStream();
+            String body;
+            if (stream == null) {
+                body = "";
+            } else {
+                // InputStream.readAllBytes() 需 API 33+，手动读取兼容低版本
+                java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+                byte[] chunk = new byte[8192];
+                int n;
+                while ((n = stream.read(chunk)) != -1) buffer.write(chunk, 0, n);
+                stream.close();
+                body = new String(buffer.toByteArray(), StandardCharsets.UTF_8);
+            }
+            if (status >= 400) throw new IOException("HTTP " + status);
+            return body;
         } finally {
             connection.disconnect();
         }
