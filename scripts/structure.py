@@ -581,8 +581,8 @@ HTML_TEMPLATE = """<!doctype html>
       table.structure th, table.structure td {{ padding: 10px 7px; }}
       .glyph {{ width: 36px; height: 36px; font-size: 22px; }}
     }}
-  </style>
 {search_css}
+  </style>
 </head>
 <body>
   <div class="page">
