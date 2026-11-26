@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import structure  # noqa: E402  复用弹窗模板与资源准备逻辑
+import search_widget  # noqa: E402  共享搜索定位组件
 
 # 字频表弹窗书家配置（独立于 structure.py 的 CALLIGRAPHERS，按需增删）：
 #   name    = 弹窗显示名
@@ -88,6 +89,7 @@ PAGE_TEMPLATE = """<!doctype html>
       border-color: var(--cinnabar); color: var(--cinnabar);
     }}
 {modal_css}
+{search_css}
   </style>
 </head>
 <body>
@@ -95,12 +97,14 @@ PAGE_TEMPLATE = """<!doctype html>
     <header class="page-head">
       <h1>字频总表</h1>
       <span class="meta">{meta}</span>
+{search_html}
     </header>
     <div class="freq-grid">
 {grid}
     </div>
   </div>
 {modal}
+{search_js}
 </body>
 </html>
 """
@@ -172,6 +176,9 @@ def render_page(characters: list[str], calligraphers: list[dict]) -> str:
         grid=render_grid(characters),
         modal_css=extract_modal_css(),
         modal=modal,
+        search_css=search_widget.SEARCH_CSS,
+        search_html=search_widget.SEARCH_HTML,
+        search_js=search_widget.SEARCH_JS,
     )
 
 

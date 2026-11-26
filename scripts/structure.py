@@ -30,6 +30,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 IDS_DIR = ROOT / "data" / "ids"
+sys.path.insert(0, str(ROOT / "scripts"))
+
+import search_widget  # noqa: E402  共享搜索定位组件
 
 # IDS 操作符 → 结构类别（HTML 网格的列名）。
 OPERATORS = {
@@ -579,18 +582,21 @@ HTML_TEMPLATE = """<!doctype html>
       .glyph {{ width: 36px; height: 36px; font-size: 22px; }}
     }}
   </style>
+{search_css}
 </head>
 <body>
   <div class="page">
     <header class="topbar">
       <h1>字形结构分布</h1>
       <span class="meta">{meta}</span>
+{search_html}
     </header>
 {content}
     <footer>{footer}</footer>
   </div>
 {modal}
 {script}
+{search_js}
 </body>
 </html>
 """
@@ -826,6 +832,9 @@ def render_html(datasets: list[dict], calligraphers: list[dict] | None = None) -
         footer=f"数据来源：CHISE IDS · 来源文件：{html.escape(sources)}",
         modal=modal,
         script="",
+        search_css=search_widget.SEARCH_CSS,
+        search_html=search_widget.SEARCH_HTML,
+        search_js=search_widget.SEARCH_JS,
     )
 
 
