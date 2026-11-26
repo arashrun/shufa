@@ -37,6 +37,11 @@ done < <(grep '^ANDROID_[A-Z_]*=' "$SECRETS")
 : "${ANDROID_KEY_PASSWORD:?ci-secrets.txt 缺少 ANDROID_KEY_PASSWORD}"
 export ANDROID_KEYSTORE_PATH="$ROOT/.signing/release.jks"
 
+# 与 CI（release.yml 的 npm run android:sync）保持一致：先构建网页并同步进
+# 安卓工程，否则 APK 里是上次 sync 的旧资源（新页面/导航会缺失）。
+echo ">> npm run android:sync"
+(cd "$ROOT" && npm run --silent android:sync)
+
 cd "$ROOT/android"
 ./gradlew assembleRelease "$@"
 echo
