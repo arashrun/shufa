@@ -198,7 +198,9 @@ def render_index(calligraphers: list[dict], works: dict[str, dict]) -> str:
             for entry in entries
         )
         toc_parts.append(
-            f'    <li class="era"><span>{html.escape(era)}</span>\n      <ul>\n{links}\n      </ul>\n    </li>'
+            f'    <li><details class="era">\n'
+            f'      <summary>{html.escape(era)}</summary>\n'
+            f"      <ul>\n{links}\n      </ul>\n    </details></li>"
         )
     toc = "\n".join(toc_parts)
 
@@ -318,19 +320,31 @@ header.page p {{ margin: 6px 0 0; color: var(--muted); font-size: 13px; }}
 nav.toc {{
   position: sticky; top: 0; z-index: 5;
   background: rgba(247, 242, 232, 0.96); border-bottom: 1px solid var(--line);
-  padding: 8px 12px; max-height: 40vh; overflow-y: auto;
+  padding: 6px 16px; max-height: 46vh; overflow-y: auto;
 }}
-nav.toc ul {{ margin: 0; padding: 0; list-style: none; }}
-nav.toc > ul {{ display: flex; flex-wrap: wrap; gap: 4px 22px; }}
-nav.toc li.era > span {{
-  color: var(--cinnabar); font-size: 13px; letter-spacing: 0.2em;
-  border-bottom: 1px solid var(--line); padding-bottom: 1px;
+nav.toc > ul {{ margin: 0; padding: 0; list-style: none; }}
+nav.toc details.era > summary {{
+  display: inline-block; cursor: pointer; color: var(--cinnabar);
+  font-size: 14px; letter-spacing: 0.2em; list-style: none;
+  padding: 2px 0; user-select: none;
 }}
-nav.toc li.era > ul {{ display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 3px; }}
+nav.toc details.era > summary::-webkit-details-marker {{ display: none; }}
+nav.toc details.era > summary::after {{ content: " ▸"; font-size: 11px; }}
+nav.toc details.era[open] > summary::after {{ content: " ▾"; }}
+nav.toc details.era > ul {{
+  display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 2px 0 6px;
+  padding: 0; list-style: none;
+}}
 nav.toc a {{ color: var(--ink); text-decoration: none; font-size: 14px; }}
 nav.toc a:hover {{ color: var(--cinnabar); }}
-main {{ max-width: 720px; margin: 0 auto; padding: 0 16px 64px; }}
-main.work {{ max-width: 720px; margin: 0 auto; padding: 24px 16px 64px; }}
+main {{
+  max-width: 720px; margin: 0 auto;
+  padding: 0 clamp(20px, 6vw, 40px) calc(76px + env(safe-area-inset-bottom, 0));
+}}
+main.work {{
+  max-width: 720px; margin: 0 auto;
+  padding: 24px clamp(20px, 6vw, 40px) calc(76px + env(safe-area-inset-bottom, 0));
+}}
 article.calligrapher {{ border-bottom: 1px solid var(--line); padding: 28px 0 20px; }}
 article.calligrapher h2 {{
   margin: 0 0 4px; font-size: 24px; letter-spacing: 0.25em; color: var(--cinnabar);
@@ -352,6 +366,15 @@ main.work section.bio p {{ font-size: 18px; }}
 small {{ color: var(--muted); font-size: 0.62em; }}
 p.back {{ text-align: center; }}
 p.back a {{ color: var(--muted); text-decoration: none; }}
+@media (max-width: 600px) {{
+  header.page {{ padding: 18px 12px 8px; }}
+  header.page h1 {{ font-size: 21px; letter-spacing: 0.25em; text-indent: 0.25em; }}
+  nav.toc {{ padding: 4px 14px; max-height: 40vh; }}
+  nav.toc details.era > summary {{ font-size: 13px; }}
+  nav.toc a {{ font-size: 13px; }}
+  article.calligrapher {{ padding: 20px 0 14px; }}
+  article.calligrapher h2 {{ font-size: 20px; }}
+}}
 @media (prefers-reduced-motion: no-preference) {{
   html {{ scroll-behavior: smooth; }}
 }}
@@ -399,6 +422,25 @@ header.page h1 {{
   margin: 0; font-size: 24px; letter-spacing: 0.3em; text-indent: 0.3em;
 }}
 header.page p {{ margin: 6px 0 0; color: var(--muted); font-size: 13px; }}
+main.work {{
+  max-width: 720px; margin: 0 auto;
+  padding: 20px clamp(20px, 6vw, 40px) calc(76px + env(safe-area-inset-bottom, 0));
+}}
+main.work section.bio h3 {{
+  margin: 18px 0 6px; font-size: 15px; color: var(--muted);
+  letter-spacing: 0.3em; font-weight: 400;
+}}
+main.work section.bio p {{
+  margin: 8px 0; font-size: 18px; text-align: justify;
+}}
+small {{ color: var(--muted); font-size: 0.62em; }}
+p.back {{ text-align: center; padding-bottom: 8px; }}
+p.back a {{ color: var(--muted); text-decoration: none; }}
+@media (max-width: 600px) {{
+  header.page {{ padding: 16px 12px 8px; }}
+  header.page h1 {{ font-size: 20px; letter-spacing: 0.25em; text-indent: 0.25em; }}
+  main.work section.bio p {{ font-size: 17px; }}
+}}
 {extra_css}
 </style>
 </head>

@@ -25,6 +25,25 @@ header.page h1 {
   margin: 0; font-size: 24px; letter-spacing: 0.3em; text-indent: 0.3em;
 }
 header.page p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+main.work {
+  max-width: 720px; margin: 0 auto;
+  padding: 20px clamp(20px, 6vw, 40px) calc(76px + env(safe-area-inset-bottom, 0));
+}
+main.work section.bio h3 {
+  margin: 18px 0 6px; font-size: 15px; color: var(--muted);
+  letter-spacing: 0.3em; font-weight: 400;
+}
+main.work section.bio p {
+  margin: 8px 0; font-size: 18px; text-align: justify;
+}
+small { color: var(--muted); font-size: 0.62em; }
+p.back { text-align: center; padding-bottom: 8px; }
+p.back a { color: var(--muted); text-decoration: none; }
+@media (max-width: 600px) {
+  header.page { padding: 16px 12px 8px; }
+  header.page h1 { font-size: 20px; letter-spacing: 0.25em; text-indent: 0.25em; }
+  main.work section.bio p { font-size: 17px; }
+}
 
 </style>
 </head>

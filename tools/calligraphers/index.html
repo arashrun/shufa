@@ -29,19 +29,31 @@ header.page p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
 nav.toc {
   position: sticky; top: 0; z-index: 5;
   background: rgba(247, 242, 232, 0.96); border-bottom: 1px solid var(--line);
-  padding: 8px 12px; max-height: 40vh; overflow-y: auto;
+  padding: 6px 16px; max-height: 46vh; overflow-y: auto;
 }
-nav.toc ul { margin: 0; padding: 0; list-style: none; }
-nav.toc > ul { display: flex; flex-wrap: wrap; gap: 4px 22px; }
-nav.toc li.era > span {
-  color: var(--cinnabar); font-size: 13px; letter-spacing: 0.2em;
-  border-bottom: 1px solid var(--line); padding-bottom: 1px;
+nav.toc > ul { margin: 0; padding: 0; list-style: none; }
+nav.toc details.era > summary {
+  display: inline-block; cursor: pointer; color: var(--cinnabar);
+  font-size: 14px; letter-spacing: 0.2em; list-style: none;
+  padding: 2px 0; user-select: none;
 }
-nav.toc li.era > ul { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 3px; }
+nav.toc details.era > summary::-webkit-details-marker { display: none; }
+nav.toc details.era > summary::after { content: " ▸"; font-size: 11px; }
+nav.toc details.era[open] > summary::after { content: " ▾"; }
+nav.toc details.era > ul {
+  display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 2px 0 6px;
+  padding: 0; list-style: none;
+}
 nav.toc a { color: var(--ink); text-decoration: none; font-size: 14px; }
 nav.toc a:hover { color: var(--cinnabar); }
-main { max-width: 720px; margin: 0 auto; padding: 0 16px 64px; }
-main.work { max-width: 720px; margin: 0 auto; padding: 24px 16px 64px; }
+main {
+  max-width: 720px; margin: 0 auto;
+  padding: 0 clamp(20px, 6vw, 40px) calc(76px + env(safe-area-inset-bottom, 0));
+}
+main.work {
+  max-width: 720px; margin: 0 auto;
+  padding: 24px clamp(20px, 6vw, 40px) calc(76px + env(safe-area-inset-bottom, 0));
+}
 article.calligrapher { border-bottom: 1px solid var(--line); padding: 28px 0 20px; }
 article.calligrapher h2 {
   margin: 0 0 4px; font-size: 24px; letter-spacing: 0.25em; color: var(--cinnabar);
@@ -63,6 +75,15 @@ main.work section.bio p { font-size: 18px; }
 small { color: var(--muted); font-size: 0.62em; }
 p.back { text-align: center; }
 p.back a { color: var(--muted); text-decoration: none; }
+@media (max-width: 600px) {
+  header.page { padding: 18px 12px 8px; }
+  header.page h1 { font-size: 21px; letter-spacing: 0.25em; text-indent: 0.25em; }
+  nav.toc { padding: 4px 14px; max-height: 40vh; }
+  nav.toc details.era > summary { font-size: 13px; }
+  nav.toc a { font-size: 13px; }
+  article.calligrapher { padding: 20px 0 14px; }
+  article.calligrapher h2 { font-size: 20px; }
+}
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }
@@ -75,7 +96,8 @@ p.back a { color: var(--muted); text-decoration: none; }
 </header>
 <nav class="toc">
   <ul>
-    <li class="era"><span>魏晋</span>
+    <li><details class="era">
+      <summary>魏晋</summary>
       <ul>
       <li><a href="#c-01-zhongyao">钟繇</a></li>
       <li><a href="#c-02-weifuren">卫夫人</a></li>
@@ -83,13 +105,15 @@ p.back a { color: var(--muted); text-decoration: none; }
       <li><a href="#c-04-wangxianzhi">王献之</a></li>
       <li><a href="#c-05-wangxun">王珣</a></li>
       </ul>
-    </li>
-    <li class="era"><span>隋</span>
+    </details></li>
+    <li><details class="era">
+      <summary>隋</summary>
       <ul>
       <li><a href="#c-06-zhiyong">智永</a></li>
       </ul>
-    </li>
-    <li class="era"><span>唐 · 五代</span>
+    </details></li>
+    <li><details class="era">
+      <summary>唐 · 五代</summary>
       <ul>
       <li><a href="#c-07-ouyangxun">欧阳询</a></li>
       <li><a href="#c-08-yushinan">虞世南</a></li>
@@ -101,8 +125,9 @@ p.back a { color: var(--muted); text-decoration: none; }
       <li><a href="#c-14-liugongquan">柳公权</a></li>
       <li><a href="#c-15-yangningshi">杨凝式</a></li>
       </ul>
-    </li>
-    <li class="era"><span>两宋</span>
+    </details></li>
+    <li><details class="era">
+      <summary>两宋</summary>
       <ul>
       <li><a href="#c-16-lijianzhong">李建中</a></li>
       <li><a href="#c-17-caixiang">蔡襄</a></li>
@@ -110,16 +135,18 @@ p.back a { color: var(--muted); text-decoration: none; }
       <li><a href="#c-19-huangtingjian">黄庭坚</a></li>
       <li><a href="#c-20-mifu">米芾</a></li>
       </ul>
-    </li>
-    <li class="era"><span>元</span>
+    </details></li>
+    <li><details class="era">
+      <summary>元</summary>
       <ul>
       <li><a href="#c-21-zhaomengfu">赵孟頫</a></li>
       <li><a href="#c-22-xianyushu">鲜于枢</a></li>
       <li><a href="#c-23-kangli-naonao">康里巎巎</a></li>
       <li><a href="#c-24-yangweizhen">杨维桢</a></li>
       </ul>
-    </li>
-    <li class="era"><span>明</span>
+    </details></li>
+    <li><details class="era">
+      <summary>明</summary>
       <ul>
       <li><a href="#c-25-zhuyunming">祝允明</a></li>
       <li><a href="#c-26-wenzhengming">文徵明</a></li>
@@ -129,14 +156,16 @@ p.back a { color: var(--muted); text-decoration: none; }
       <li><a href="#c-30-huangdaozhou">黄道周</a></li>
       <li><a href="#c-31-niyuanlu">倪元璐</a></li>
       </ul>
-    </li>
-    <li class="era"><span>明清之际</span>
+    </details></li>
+    <li><details class="era">
+      <summary>明清之际</summary>
       <ul>
       <li><a href="#c-32-wangduo">王铎</a></li>
       <li><a href="#c-33-fushan">傅山</a></li>
       </ul>
-    </li>
-    <li class="era"><span>清 · 近代</span>
+    </details></li>
+    <li><details class="era">
+      <summary>清 · 近代</summary>
       <ul>
       <li><a href="#c-34-liuyong">刘墉</a></li>
       <li><a href="#c-35-hesaoji">何绍基</a></li>
@@ -145,7 +174,7 @@ p.back a { color: var(--muted); text-decoration: none; }
       <li><a href="#c-38-shenyinmo">沈尹默</a></li>
       <li><a href="#c-39-qigong">启功</a></li>
       </ul>
-    </li>
+    </details></li>
   </ul>
 </nav>
   <article class="calligrapher" id="c-01-zhongyao">
