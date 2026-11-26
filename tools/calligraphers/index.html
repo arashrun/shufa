@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>历代书家谱</title>
+<style>
+:root {
+  --ink: #2b2620;
+  --paper: #f7f2e8;
+  --cinnabar: #a83232;
+  --muted: #7a7062;
+  --line: #ddd3c0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 16px/1.9 "Songti SC", "Noto Serif SC", "SimSun", serif;
+}
+header.page {
+  padding: 28px 16px 12px; text-align: center;
+  border-bottom: 3px double var(--line);
+}
+header.page h1 {
+  margin: 0; font-size: 26px; letter-spacing: 0.35em; text-indent: 0.35em;
+  font-weight: 700;
+}
+header.page p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+nav.toc {
+  position: sticky; top: 0; z-index: 5;
+  background: rgba(247, 242, 232, 0.96); border-bottom: 1px solid var(--line);
+  padding: 8px 12px;
+}
+nav.toc ul {
+  margin: 0; padding: 0; list-style: none;
+  display: flex; flex-wrap: wrap; gap: 4px 14px;
+}
+nav.toc a { color: var(--ink); text-decoration: none; font-size: 14px; }
+nav.toc a:hover { color: var(--cinnabar); }
+main { max-width: 720px; margin: 0 auto; padding: 0 16px 64px; }
+article.calligrapher { border-bottom: 1px solid var(--line); padding: 28px 0 20px; }
+article.calligrapher h2 {
+  margin: 0 0 4px; font-size: 24px; letter-spacing: 0.25em; color: var(--cinnabar);
+}
+article.calligrapher h2::before { content: "「"; color: var(--muted); }
+article.calligrapher h2::after { content: "」"; color: var(--muted); }
+section.bio h3 {
+  margin: 20px 0 6px; font-size: 15px; color: var(--muted);
+  letter-spacing: 0.3em; font-weight: 400;
+}
+section.bio p { margin: 8px 0; text-align: justify; }
+section.bio ul { margin: 8px 0; padding-left: 0; list-style: none; }
+section.bio li {
+  margin: 10px 0; padding-left: 1.2em; text-indent: -1.2em; text-align: justify;
+}
+section.bio li::before { content: "◦ "; color: var(--cinnabar); }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+</style>
+</head>
+<body>
+<header class="page">
+  <h1>历代书家谱</h1>
+  <p>楷书 · 行书 · 按时代为序</p>
+</header>
+<nav class="toc">
+  <ul>
+      <li><a href="#c-01-zhongyao">钟繇</a></li>
+      <li><a href="#c-02-weifuren">卫夫人</a></li>
+      <li><a href="#c-03-wangxizhi">王羲之</a></li>
+      <li><a href="#c-04-wangxianzhi">王献之</a></li>
+      <li><a href="#c-05-wangxun">王珣</a></li>
+      <li><a href="#c-06-zhiyong">智永</a></li>
+      <li><a href="#c-07-ouyangxun">欧阳询</a></li>
+      <li><a href="#c-08-yushinan">虞世南</a></li>
+      <li><a href="#c-09-chusuilang">褚遂良</a></li>
+      <li><a href="#c-10-xueji">薛稷</a></li>
+      <li><a href="#c-11-lujianzhi">陆柬之</a></li>
+      <li><a href="#c-12-liyong">李邕</a></li>
+      <li><a href="#c-13-yanzhenqing">颜真卿</a></li>
+      <li><a href="#c-14-liugongquan">柳公权</a></li>
+      <li><a href="#c-15-yangningshi">杨凝式</a></li>
+      <li><a href="#c-16-lijianzhong">李建中</a></li>
+      <li><a href="#c-17-caixiang">蔡襄</a></li>
+      <li><a href="#c-18-sushi">苏轼</a></li>
+      <li><a href="#c-19-huangtingjian">黄庭坚</a></li>
+      <li><a href="#c-20-mifu">米芾</a></li>
+      <li><a href="#c-21-zhaomengfu">赵孟頫</a></li>
+      <li><a href="#c-22-xianyushu">鲜于枢</a></li>
+      <li><a href="#c-23-kangli-naonao">康里巎巎</a></li>
+      <li><a href="#c-24-yangweizhen">杨维桢</a></li>
+      <li><a href="#c-25-zhuyunming">祝允明</a></li>
+      <li><a href="#c-26-wenzhengming">文徵明</a></li>
+      <li><a href="#c-27-wangchong">王宠</a></li>
+      <li><a href="#c-28-dongqichang">董其昌</a></li>
+      <li><a href="#c-29-zhangruitu">张瑞图</a></li>
+      <li><a href="#c-30-huangdaozhou">黄道周</a></li>
+      <li><a href="#c-31-niyuanlu">倪元璐</a></li>
+      <li><a href="#c-32-wangduo">王铎</a></li>
+      <li><a href="#c-33-fushan">傅山</a></li>
+      <li><a href="#c-34-liuyong">刘墉</a></li>
+      <li><a href="#c-35-hesaoji">何绍基</a></li>
+      <li><a href="#c-36-zhaozhiqian">赵之谦</a></li>
+      <li><a href="#c-37-wuchangshuo">吴昌硕</a></li>
+      <li><a href="#c-38-shenyinmo">沈尹默</a></li>
+      <li><a href="#c-39-qigong">启功</a></li>
+  </ul>
+</nav>
+<main>
+  <article class="calligrapher" id="c-01-zhongyao">
+    <h2>钟繇</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>三国魏颍川长社人，官至太傅，世称「钟太傅」。楷书之祖，与王羲之并称「钟王」。其楷书由汉隶蜕化而来，字形扁方，笔势朴厚古拙，存有隶书遗意，是后世学习小楷的重要源头。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《宣示表》：小楷代表作，传为王羲之临本刻入《淳化阁帖》，笔法端严古雅。</li>
+      <li>《荐季直表》：传世墨迹本，笔势温厚，结体宽博。</li>
+      <li>《贺捷表》：楷中带行，古朴灵动。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-02-weifuren">
+    <h2>卫夫人</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>东晋河东安邑人，名铄，字茂漪，汝阴太守李矩之妻，世称「卫夫人」。书圣王羲之的启蒙老师，师承钟繇而自成风貌，笔法古质醇厚。所著《笔阵图》为书论经典，「横如千里阵云」诸喻影响深远。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《笔阵图》：书论名篇（传），论七种基本笔画的意象，是习字者最早的笔法教材之一。</li>
+      <li>《急就帖》：传世刻帖，真迹无存，见诸历代丛帖。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-03-wangxizhi">
+    <h2>王羲之</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>东晋琅琊临沂人，官至右军将军，世称「王右军」。书圣，行书、楷书、草书皆冠绝古今。行书遒媚劲健、变化万千，楷书一变古法为新体，对后世影响无出其右。与钟繇并称「钟王」，与其子王献之并称「二王」。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《兰亭序》：天下第一行书，永和九年会稽兰亭雅集所书，二十八行三百二十四字，凡重字皆变其体。</li>
+      <li>《快雪时晴帖》：行书短札，乾隆列为「三希」之首。</li>
+      <li>《丧乱帖》：唐摹本，行草，笔势顿挫郁勃。</li>
+      <li>《圣教序》（集字）：怀仁集王字刻石，为学行书最重要的范本之一。</li>
+      <li>《黄庭经》《乐毅论》：小楷名品。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-04-wangxianzhi">
+    <h2>王献之</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>东晋王羲之第七子，与父并称「二王」。行草外拓，笔势连绵奔放，变父亲内擫为纵逸，创「一笔书」，对后世狂草影响深远。楷书亦秀润开朗。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《中秋帖》：传为米芾临本，行草连绵，被誉为「一笔书」之祖，「三希」之一。</li>
+      <li>《鸭头丸帖》：行草真迹摹本，笔速迅疾，全帖十余字而气象万千。</li>
+      <li>《洛神赋十三行》：小楷，刻本称「玉版十三行」，秀逸开张。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-05-wangxun">
+    <h2>王珣</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>东晋琅琊临沂人，字元琳，官至尚书令，王导之孙，与王羲之为族亲。《伯远帖》为唯一传世的东晋名家真迹，乾隆定为「三希」之一。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《伯远帖》：行书真迹，纸本，四十七字，笔致潇洒古淡，历来为行书取法的重要实物，现藏故宫博物院。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-06-zhiyong">
+    <h2>智永</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>南朝陈至隋间僧人，会稽人，王羲之七世孙。居永欣寺阁上临书三十年，写真草《千字文》八百余本分施浙东诸寺。笔法精熟圆劲，承家学而开唐人法门。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《真草千字文》（墨迹本）：日本藏唐摹本与关中本刻石，真书圆融温润，是学习楷书与草书转换的经典范本。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-07-ouyangxun">
+    <h2>欧阳询</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>唐初潭州临湘人，楷书四大家之首。书法远承魏晋，险劲峭拔，法度森严，世称「欧体」。结体于平正中见险绝，点画斩钉截铁，为唐楷定型的重要奠基者。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《九成宫醴泉铭》：楷书第一经典，贞观六年书丹，用笔方整，结体内敛险峻，后世习楷多由此入门。</li>
+      <li>《化度寺碑》：结构精紧，历来评价甚高，被认为不下于《九成宫》。</li>
+      <li>《虞恭公碑》《皇甫诞碑》：欧体小楷与中楷的另两种面貌。</li>
+      <li>《卜商帖》《张翰帖》：行书墨迹。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-08-yushinan">
+    <h2>虞世南</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>唐初越州余姚人，太宗朝重臣，赐「永兴」。师承智永，得二王真传，楷书外柔内刚，笔致圆融冲和，气质最为温雅。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《孔子庙堂碑》：虞书代表，用笔圆融，气息宁静雍容，原碑早毁，今存陕西本、城武本翻刻。</li>
+      <li>《汝南公主墓志铭》（传）：行书墨迹，萧散虚和。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-09-chusuilang">
+    <h2>褚遂良</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>唐初杭州钱塘人，封河南郡公，世称「褚河南」。初学欧、虞，后法二王，楷书瘦劲通神，笔画纤细而筋骨内含，结体宽舒流动，有「美人婵娟」之誉，是唐楷由初唐向盛唐过渡的关键。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《雁塔圣教序》：褚书晚年代表，笔法空灵瘦劲，为习褚首选。</li>
+      <li>《孟法师碑》：兼有欧虞法度，较为平正。</li>
+      <li>《阴符经》（传）：大字楷书墨迹，笔势跌宕。</li>
+      <li>《倪宽赞》（传）：小楷墨迹，清秀舒展。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-10-xueji">
+    <h2>薛稷</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>唐代蒲州汾阴人，官至太子少保，封晋国公。「初唐四家」之一（欧、虞、褚、薛），外祖魏征家藏虞褚旧迹甚多，遂以褚遂良为宗而更瘦硬挺拔，时谚称「买褚得薛，不失其节」。又以画鹤知名。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《信行禅师碑》：薛书代表，存贾余庆翻刻本，瘦劲通神。</li>
+      <li>《升仙太子碑》碑阴题名：武则天所立大碑阴侧有其楷书题字。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-11-lujianzhi">
+    <h2>陆柬之</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>唐初吴郡人，虞世南外甥，书法传舅氏笔法，再上溯二王。行书温润平和，少存世。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《文赋》：行书长卷墨迹，书西晋陆机《文赋》全篇，笔法渊雅，赵孟頫行书多从此出。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-12-liyong">
+    <h2>李邕</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>唐代扬州江都人，官至北海太守，世称「李北海」。以行书入碑，一改当时以楷书立碑的惯例。书风雄浑豪迈，左低右高，笔力舒展迟重，对后世行书影响极大。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《麓山寺碑》：行楷入碑的代表，笔力雄健，结体开张。</li>
+      <li>《李思训碑》：行书碑刻，遒劲爽利，赵孟頫、董其昌皆受其沾溉。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-13-yanzhenqing">
+    <h2>颜真卿</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>唐代琅琊临沂人，官至刑部尚书，封鲁郡公，世称「颜鲁公」。楷书四大家之一。变初唐瘦硬为雄浑宽博，创「颜体」，笔画横细竖粗、外拓饱满，气象堂皇；忠烈殉国，书品人品并峙。行书稿尤为千古独步。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《多宝塔碑》：颜体早期作品，用笔规范清晰，是入门颜体最常用的碑帖。</li>
+      <li>《颜勤礼碑》：晚年代表作，雄浑苍劲，颜体典型。</li>
+      <li>《颜氏家庙碑》：晚岁最厚重之作，人书俱老。</li>
+      <li>《祭侄文稿》：天下第二行书，安史之乱中为侄季明所书祭稿，情绪激愤，涂改满纸而真气弥漫。</li>
+      <li>《争座位帖》：行书信稿刻本，与《祭侄文稿》同气。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-14-liugongquan">
+    <h2>柳公权</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>唐代京兆华原人，官至太子少师，世称「柳少师」。楷书四大家之一。取欧颜之长而自成一家，骨力遒劲，中宫收紧，世称「柳体」，与颜体并称「颜筋柳骨」。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《玄秘塔碑》：柳体最通行范本，用笔斩截，骨力清刚。</li>
+      <li>《神策军碑》：晚年力作，结构更为严谨端整，存拓极少而价值极高。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-15-yangningshi">
+    <h2>杨凝式</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>五代华阴人，历仕梁唐晋汉周，佯狂自晦，世称「杨疯子」。当时寺观墙壁多被其题遍。行书由唐入宋的关键人物，破唐人法度而启宋人尚意书风，黄庭坚、苏轼皆受其启发。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《韭花帖》：睡起得韭花佐饭之佳而致谢书札，行楷疏朗，字距行距极大，散淡空灵，为千古名迹。</li>
+      <li>《卢鸿草堂十志图跋》：笔势沉雄苍茫。</li>
+      <li>《神仙起居法》：行草连绵，纵横恣肆。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-16-lijianzhong">
+    <h2>李建中</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>北宋京兆人，屡任西京留司御史台，世称「李西台」。宋初书坛承唐启宋的关键人物，师法颜真卿而行书丰肌秀骨，圆转从容，为当时所宗。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《土母帖》：行书墨迹，「西台六帖」之一，现藏台北故宫博物院。</li>
+      <li>《同年帖》《贵宅帖》：行书尺牍。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-17-caixiang">
+    <h2>蔡襄</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>北宋兴化仙游人，官至端明殿学士，「宋四家」之一，居苏黄米之前。书风端正温淳，恪守晋唐法度，楷书端庄，行书婉媚，时人推为本朝第一。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《自书诗帖》：行书墨迹长卷，从容雅逸。</li>
+      <li>《蒙惠帖》《扈从帖》：行书尺牍。</li>
+      <li>《万安桥记》：大字楷书刻石，端劲宏壮。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-18-sushi">
+    <h2>苏轼</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>北宋眉山人，号东坡居士，文学家、书画家，「宋四家」之首。主张「我书意造本无法」，尚意书风的代表。行书丰腴跌宕，用笔偃卧取横势，天真烂漫，自具一派。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《寒食帖》：天下第三行书，黄州寒食诗二首，随情绪起伏笔画大小悬殊，被黄庭坚誉为「兼其骨气、兼其神采」。</li>
+      <li>《前赤壁赋》：行楷长卷，端庄流丽。</li>
+      <li>《洞庭春色赋·中山松醪赋》：晚年行书合并长卷。</li>
+      <li>《一夜帖》《人来得书帖》：行书尺牍。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-19-huangtingjian">
+    <h2>黄庭坚</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>北宋洪州分宁人，号山谷道人，「宋四家」之一。行书中宫紧收、长枪大戟，辐射式结体奇纵有致；用笔擒纵自如，得《瘗鹤铭》之神。草书为宋代第一，与行书并擅。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《松风阁诗帖》：行书代表，笔画舒展，波势明显。</li>
+      <li>《经伏波神祠诗卷》：行书长卷，苍劲老辣。</li>
+      <li>《寒食帖跋》：与苏书合璧，行书遒媚。</li>
+      <li>《诸上座帖》《李白忆旧游诗卷》：草书巨迹。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-20-mifu">
+    <h2>米芾</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>北宋太原人，徙居襄阳，号海岳外史，世称「米颠」，「宋四家」之一。集古出新的典型，遍临晋唐诸帖而自成一格。行书八面出锋，沉着痛快，变化莫测；其 «刷字» 自评道尽笔势爽利。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《蜀素帖》：书于乌丝栏织绢上，行书代表，笔势跳荡灵动。</li>
+      <li>《苕溪诗帖》：行书长卷，中年力作。</li>
+      <li>《研山铭》：大字行书，沉雄飞动。</li>
+      <li>《向太后挽词》：小楷。</li>
+      <li>《多景楼诗帖》：大字行书。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-21-zhaomengfu">
+    <h2>赵孟頫</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>宋末元初吴兴人，宋宗室后裔，入仕元朝，官至翰林学士承旨，封魏国公，世称「赵松雪」「赵吴兴」。楷书四大家中唯一的非唐人。博采晋唐，复古出新，五体皆能，日书万字。楷书圆润秀逸称「赵体」，行书上追二王，为元明清数百年宗师。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《胆巴碑》：赵体大楷代表，风华整丽。</li>
+      <li>《妙严寺记》：楷书墨迹，端稳圆劲。</li>
+      <li>《洛神赋》：行书名迹，遒媚姿媚。</li>
+      <li>《前后赤壁赋》：行书长卷，圆转流美。</li>
+      <li>《汲黯传》：小楷经典，直追晋唐。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-22-xianyushu">
+    <h2>鲜于枢</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>元代蓟州人，官太常寺典簿，与赵孟頫齐名而并称「二鲜」。行草笔法源于晋唐，气象恢宏，善悬腕作书，草书尤为当代第一，赵孟頫自叹弗如。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《石鼓歌》：草书墨迹长卷，雄放酣畅。</li>
+      <li>《苏轼海棠诗卷》：行草大字，笔力遒健。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-23-kangli-naonao">
+    <h2>康里巎巎</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>元代西域康里部人，字子山，官至翰林学士承旨，世称「巎子山」。少数民族书家的代表，楷法学虞世南、钟繇，行草宗二王，劲健圆雄，相传日写三万字，与赵孟頫并称「北巎南赵」。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《述笔法记卷》：草书墨迹，笔势爽利。</li>
+      <li>《李白古风诗卷》：行草巨幅，奇崛豪纵。</li>
+      <li>《唐人绝句六首》：草书，现藏故宫博物院。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-24-yangweizhen">
+    <h2>杨维桢</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>元末诸暨人，字廉夫，号铁崖、铁笛道人，诗文领袖，「铁崖体」开创者。行书破正格而出险怪，字势欹侧、点画狼藉，以丑为美，个性极强，被后世视为表现主义书风之先声。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《真镜庵募缘疏卷》：行草代表，欹侧狂怪而笔法精到。</li>
+      <li>《城南唱和诗卷》：行书，奇崛古拙。</li>
+      <li>《竹西草堂记题卷》：行书，现藏辽宁省博物馆。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-25-zhuyunming">
+    <h2>祝允明</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明代长洲人，字希哲，号枝山，因右手六指自号枝指生，「吴中四才子」之一。楷法自二王、钟繇出，行楷精绝；晚年大字行草纵逸豪放，与文徵明、王宠并称「吴门三家」。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《前后赤壁赋卷》：狂草巨迹，文徵明跋称其行楷精绝。</li>
+      <li>《出师表卷》：草书，笔势奔腾。</li>
+      <li>《洛神赋卷》：行草，法度与才情兼备。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-26-wenzhengming">
+    <h2>文徵明</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明代长洲人，号衡山居士，「吴门四家」之一。书画全能而寿至九十，临池不辍数十年。小楷精绝，行书出二王而掺以智永、赵孟頫，温润清雅，晚年大字行书转师黄庭坚而苍劲挥洒。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《琴赋》：小楷代表作，法度精严。</li>
+      <li>《滕王阁序》：行书名迹。</li>
+      <li>《赤壁赋》扇面诸作：行书小字，精雅之至。</li>
+      <li>《西苑诗卷》：行书大字长卷。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-27-wangchong">
+    <h2>王宠</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明代吴县人，字履仁，后字履吉，号雅宜山人，与祝允明、文徵明并称「吴门三家」。小楷取法钟王、虞世南，高古朴茂，疏淡萧散，一扫时人姿媚；惜年四十而逝，风格却独标一格。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《游包山集》：小楷名品，古雅冲淡。</li>
+      <li>《自书五忆歌》：行草大字，郁勃苍润。</li>
+      <li>《千字文》：小楷与行草均有写本传世。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-28-dongqichang">
+    <h2>董其昌</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明代华亭人，官至南京礼部尚书，号思白、香光居士。书画理论与创作皆宗师级人物，「南北宗论」的提出者。书风秀逸疏淡，以生拙、虚灵取胜，行草空灵俊爽，对清代康乾书坛影响极大。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《琵琶行》：行书长卷。</li>
+      <li>《烟江叠嶂图跋》：行书，疏朗萧散。</li>
+      <li>《昼锦堂记》：行书大字长卷。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-29-zhangruitu">
+    <h2>张瑞图</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明末晋江人，字长公，号二水，官至建极殿大学士。晚明个性书风代表，行草以方折尖峭的用笔打破圆转惯例，翻折峻拔，气象奇崛，与倪元璐、黄道周、王铎并称晚明四家。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《赤壁赋赋卷》：行草代表作，方折盘旋。</li>
+      <li>《杜甫饮中八仙歌卷》：草书，奇逸纵横。</li>
+      <li>《承天寺十奇诗》：行书。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-30-huangdaozhou">
+    <h2>黄道周</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明末漳浦人，字幼玄，号石斋，官至礼部尚书，殉节于抗清。楷法由钟繇出而参以隶意，方峻峭厉；行草遒劲奇崛，书卷气与忠烈之气并存。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《孝经》《榕坛问业》：小楷代表，方笔高古。</li>
+      <li>《自书诗卷》：行草，遒媚劲健。</li>
+      <li>《山中杂咏卷》：行草墨迹。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-31-niyuanlu">
+    <h2>倪元璐</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明末上虞人，字玉汝，号鸿宝，官至户部尚书，殉节于国难。行草用笔苍劲，结体倾侧险峻而气势贯通，墨色枯润相生，与黄道周、王铎同调而更见郁勃。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《行书七言诗轴》诸立轴：苍浑奇崛，为晚明大轴行草典型。</li>
+      <li>《舞鹤赋卷》：行草，郁勃飞动。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-32-wangduo">
+    <h2>王铎</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明末清初孟津人，官至礼部尚书，世称「王孟津」。与董其昌并称「南董北王」。行草师法二王、颜真卿与米芾，以连绵草书名世：一笔数字相连，用墨由饱润至枯渴，涨墨法大胆独造，笔势雄强跌宕。附郭尚先评：「孟津王觉斯……二王之后无此笔力。」</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《赠张抱一行书诗卷》《赠张抱一草书诗卷》：五十岁前后巨迹，连绵之势已成。</li>
+      <li>《拟山园帖》：刻帖汇集毕生之作。</li>
+      <li>《琅华馆帖》：与《拟山园帖》并列的刻帖名品。</li>
+      <li>大轴行草立轴多幅存世，博物馆多见收藏。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-33-fushan">
+    <h2>傅山</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>明末清初阳曲人，字青主，号朱衣道人。医学家、思想家兼书法家。提出「宁拙毋巧，宁丑毋媚，宁支离毋轻滑，宁真率毋安排」的「四宁四毋」，行草连绵奇崛，真率任性，是清初个性书风的旗帜。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《丹枫阁记》：行书，苍劲深稳。</li>
+      <li>《晋公千古一快四条屏》：行草巨幛，连绵飞动。</li>
+      <li>《啬庐妙翰》：混合诸体的奇作。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-34-liuyong">
+    <h2>刘墉</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>清代诸城人，字崇如，官至体仁阁大学士，世称「浓墨宰相」。帖学一脉的集大成者，行书以浓墨拙厚取胜，貌丰骨劲，绵里藏针，晚年笔法愈趋古淡。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>小行书诗册、尺牍多种：墨浓字丰，拙中含秀。</li>
+      <li>《临古诸帖册》：出入晋唐而自化。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-35-hesaoji">
+    <h2>何绍基</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>清代道州人，号东洲居士，晚号蝯叟。楷书从颜体入手，中年极力北碑，晚年溯源篆隶。创回腕悬肘执笔法，日课五百字，笔势圆浑遒厚，碑帖融会，为清代碑学代表书家。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《邓石如墓志铭》：楷书碑帖融合之作。</li>
+      <li>各体《四赋》等临作：临《张迁碑》《礼器碑》数百通，以自家笔法化出。</li>
+      <li>行书手札：生拙遒劲，金石气与书卷气兼具。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-36-zhaozhiqian">
+    <h2>赵之谦</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>清代会稽人，字撝叔，号悲庵。碑学书家的全能者，书画篆刻皆开一代风气。楷书以北碑为体、颜书为意，方峻而灵动；行书手札融碑帖于一，爽健雅致。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《潘曾绶墓志铭》：楷书碑派典型。</li>
+      <li>尺牍册页：行书融魏碑笔意，为碑派行书代表。</li>
+      <li>《急就篇》四条屏：魏碑体楷书。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-37-wuchangshuo">
+    <h2>吴昌硕</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>清末民初安吉人，名俊卿，字昌硕，号缶庐。西泠印社首任社长。以石鼓文筑基，行书用笔浑厚老辣，遒劲而郁勃，金石气入行草，为碑学延展至行书的代表。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>临《石鼓文》诸种：毕生临写不辍，日日常新。</li>
+      <li>行书诗稿、尺牍：苍茫浑厚，一气呵成。</li>
+      <li>《修震泽许塘记》：行楷碑意浓重。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-38-shenyinmo">
+    <h2>沈尹默</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>近代吴兴人，生于陕西汉阴，字中、秋明。民国至现代帖学复兴的领袖，北京大学教授。力矫碑学偏至，重提二王笔法，楷书精严，行书清雅隽秀，著有《学书丛话》等。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《执笔五字法》：笔法论著墨迹。</li>
+      <li>行书自作诗词卷册：清劲秀雅。</li>
+      <li>为上海等多处书写的匾额、字帖范本。</li>
+      </ul>
+    </section>
+  </article>
+  <article class="calligrapher" id="c-39-qigong">
+    <h2>启功</h2>
+    <section class="bio">
+      <h3>简介</h3>
+      <p>现代北京人，姓爱新觉罗，字元白。书画家、文献学家，中国书法家协会首任主席。楷书精严秀逸，行书清朗遒劲，结体自有「黄金分割」之说，书卷气极浓，是二十世纪末影响最大的书家之一。</p>
+    </section>
+    <section class="bio">
+      <h3>作品集</h3>
+      <ul>
+      <li>《论书绝句百首》：诗、书合璧，兼为书论名作。</li>
+      <li>自作题跋、尺牍：行书清劲洒落。</li>
+      <li>为北京师范大学等题写的校名牌匾。</li>
+      </ul>
+    </section>
+  </article>
+</main>
+</body>
+</html>
